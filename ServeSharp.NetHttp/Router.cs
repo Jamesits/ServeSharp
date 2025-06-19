@@ -48,7 +48,7 @@ namespace ServeSharp.NetHttp
         public void Head(string path, HandleFunc<Context> handler) => Route(HttpMethod.Head, path, handler);
         public void Trace(string path, HandleFunc<Context> handler) => Route(HttpMethod.Trace, path, handler);
 
-        public async ServeSharp.Core.Middleware.Middleware Handle(Context context)
+        public async Middleware Handle(Context context)
         {
             // DeferrableAwaiter must be created here so that task continuations are flattened to this level.
             await using var next = new DeferrableAwaiter();
@@ -61,7 +61,7 @@ namespace ServeSharp.NetHttp
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private static async ServeSharp.Core.Middleware.Middleware DefaultNotFoundHandler(Context context, DeferrableAwaiter next)
+        private static async Middleware DefaultNotFoundHandler(Context context, DeferrableAwaiter next)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             Console.WriteLine("404 NOT FOUND");
