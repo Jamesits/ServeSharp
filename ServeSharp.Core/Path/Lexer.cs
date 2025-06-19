@@ -2,9 +2,9 @@
 // ReSharper disable IdentifierTypo
 using sly.lexer;
 
-namespace ServeSharp.Core.Route
+namespace ServeSharp.Core.Path
 {
-    internal enum RouteToken
+    public enum RouteToken
     {
         [Sugar("/")]
         ROOT,

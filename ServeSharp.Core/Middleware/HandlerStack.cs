@@ -4,53 +4,34 @@ using System.Collections.Generic;
 
 namespace ServeSharp.Core.Middleware
 {
-    public delegate Middleware HandleFunc(Context context, DeferrableAwaiter next);
+    public delegate Middleware HandleFunc<in T>(T context, DeferrableAwaiter next);
 
-    public delegate bool ExceptionHandleFunc(Exception ex);
-
-    public class HandlerStack
+    public class HandlerStack<T>
     {
-        private readonly List<HandleFunc> _handles = new List<HandleFunc>();
+        private readonly List<HandleFunc<T>> _handles = new List<HandleFunc<T>>();
 
         public HandlerStack() { }
 
-        public HandlerStack(params HandleFunc[] handles)
+        public HandlerStack(params HandleFunc<T>[] handles)
         {
             _handles.AddRange(handles);
         }
 
-        public void Add(HandleFunc handle) => _handles.Add(handle);
+        public void Add(params HandleFunc<T>[] handles) => _handles.AddRange(handles);
 
-        public async Middleware Handle(Context context, DeferrableAwaiter next)
+        public async Middleware Handle(T context, DeferrableAwaiter next)
         {
-            Exception? e = null;
-            var stackDepth = 0;
-
             foreach (var h in _handles)
             {
                 try
                 {
                     await h(context, next);
-                    stackDepth += 1;
                 }
                 catch (Exception ex)
                 {
-                    e = ex;
+                    // If an exception is thrown anywhere inside the top half of the invocation, stop the handler chain 
+                    next.QueueException(ex);
                     break;
-                }
-            }
-
-            for (; stackDepth > 0; stackDepth--)
-            {
-                try
-                {
-                    next.QueueException(e);
-                    e = null;
-                    next.StepUnwind();
-                }
-                catch (Exception ex)
-                {
-                    e = ex;
                 }
             }
         }

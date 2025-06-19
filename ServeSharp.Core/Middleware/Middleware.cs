@@ -42,7 +42,7 @@ namespace ServeSharp.Core.Middleware
             _ctTopHalf.WaitHandle.WaitOne();
         }
 
-        // Required by AsyncMethodBuilder
+        // Used by AsyncMethodBuilder
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void SetException(Exception exception)
         {
@@ -93,6 +93,7 @@ namespace ServeSharp.Core.Middleware
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetStateMachine(IAsyncStateMachine stateMachine) { }
 
+        // Will be called if there is an exception thrown in the async function
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetException(Exception exception)
         {
@@ -100,13 +101,14 @@ namespace ServeSharp.Core.Middleware
             SignalBottomHalfDone();
         }
 
-        // Mark the whole task as completed
+        // Will be called if the async function being awaited finished successfully.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetResult()
         {
             SignalBottomHalfDone();
         }
 
+        // Signal that we reached an `await next`
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SignalTopHalfDone(DeferrableAwaiter da, Action completion)
         {
@@ -114,7 +116,7 @@ namespace ServeSharp.Core.Middleware
             {
                 if (_ctsTopHalf.IsCancellationRequested)
                 {
-                    throw new InvalidOperationException("Can't await next twice");
+                    throw new InvalidOperationException("Can't `await next` twice");
                 }
 
                 // queue the lower half
@@ -129,7 +131,8 @@ namespace ServeSharp.Core.Middleware
             }
         }
 
-        // This method might be invoked twice if the middleware does not call await Next.
+        // Signal that the function finished.
+        // Note: This method might be invoked twice if the middleware does not call await Next.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SignalBottomHalfDone()
         {

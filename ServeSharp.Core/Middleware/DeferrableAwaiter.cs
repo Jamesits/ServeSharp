@@ -18,6 +18,15 @@ namespace ServeSharp.Core.Middleware
         // Queued exception to be raised on `await`
         private Exception? _exception;
 
+        // Queue an exception to be raised at next await
+        public void QueueException(Exception? exception)
+        {
+            lock (this)
+            {
+                _exception = exception;
+            }
+        }
+
         // Manually add functions to the defer stack
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Defer(Action action)
@@ -32,19 +41,6 @@ namespace ServeSharp.Core.Middleware
             }
         }
 
-        // Execute one deferred action on the top of the stack
-        // This is required if you want to control exception propagation rather than just throw onto the initial caller of the async task chain.
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void StepUnwind()
-        {
-            lock (this)
-            {
-                var ok = _completions.TryPop(out var action);
-                if (!ok) throw new InvalidOperationException("Nothing to unwind");
-                action();
-            }
-        }
-
         // Execute the deferred code blocks and mark the object as disposed
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ContinueAll()
@@ -53,28 +49,46 @@ namespace ServeSharp.Core.Middleware
             {
                 if (_completed) return;
                 _completed = true;
+            }
 
-                while (true)
+            while (true)
+            {
+                var ok = _completions.TryPop(out var action);
+                if (!ok) break;
+
+                // Notes on exception handling
+                try
                 {
-                    var ok = _completions.TryPop(out var action);
-                    if (!ok) break;
+                    // The action starts from this.GetResult(), so if there is one pending exception, the action will immediately receive the exception.
                     action();
+                }
+                catch (Exception ex)
+                {
+                    // If the action did not do try {await xxx}, the exception will be back here, so we can try the next action.
+                    // If the exception is not handled anywhere inside the action stack, it will bubble back to the function where this object is disposed.
+                    QueueException(ex);
                 }
             }
         }
-
-        // impl of ICriticalNotifyCompletion
+        #region impl of ICriticalNotifyCompletion
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnCompleted(Action completion) => Defer(completion);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void UnsafeOnCompleted(Action completion) => Defer(completion);
 
-        // impl of Task type (Awaitable expressions)
+        #endregion
+
+        #region impl of Task type (Awaitable expressions)
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DeferrableAwaiter GetAwaiter() => this;
 
-        // impl of Awaiter
+        #endregion
+
+        #region impl of Awaiter
+
         // IsCompleted should always return false unless the object has been disposed, so that we can stash the following state machine invocation into our stack.
         public bool IsCompleted
         {
@@ -100,7 +114,11 @@ namespace ServeSharp.Core.Middleware
                 }
             }
         }
-        
+
+        #endregion
+
+        #region impl of IDisposable and IAsyncDisposable
+
         // impl of IDisposable and IAsyncDisposable
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => ContinueAll();
@@ -110,13 +128,6 @@ namespace ServeSharp.Core.Middleware
         public async ValueTask DisposeAsync() => ContinueAll();
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
-        // Queue an exception to be raised at next await
-        public void QueueException(Exception? exception)
-        {
-            lock (this)
-            {
-                _exception = exception;
-            }
-        }
+        #endregion
     }
 }

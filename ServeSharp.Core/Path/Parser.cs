@@ -9,10 +9,10 @@ using sly.parser.generator;
 using sly.parser.parser;
 
 [assembly: InternalsVisibleTo("ServeSharp.Core.Test")]
-namespace ServeSharp.Core.Route
+namespace ServeSharp.Core.Path
 {
     [ParserRoot("route")]
-    internal class Parser
+    public class Parser
     {
         public static Parser<RouteToken, Matcher> New()
         {

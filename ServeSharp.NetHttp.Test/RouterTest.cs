@@ -1,6 +1,7 @@
 ﻿using ServeSharp.Core.Middleware;
+using ServeSharp.NetHttp;
 
-namespace ServeSharp.Core.Test;
+namespace ServeSharp.NetHttp.Test;
 
 public class RouterTest
 {
@@ -59,7 +60,7 @@ public class RouterTest
         _router.Handle(ctx);
     }
 
-    public static async Middleware.Middleware recovery(Context context, DeferrableAwaiter next)
+    public static async Middleware recovery(Context context, DeferrableAwaiter next)
     {
         Console.WriteLine("Recovery enter");
 

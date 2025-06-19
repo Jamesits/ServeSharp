@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using sly.parser;
 
-namespace ServeSharp.Core.Route
+namespace ServeSharp.Core.Path
 {
     public static class ParserResultExtension
     {

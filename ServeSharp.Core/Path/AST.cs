@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ServeSharp.Core.Route
+namespace ServeSharp.Core.Path
 {
     public abstract class Matcher
     {
@@ -77,7 +77,6 @@ namespace ServeSharp.Core.Route
             return (remainder == "");
         }
     }
-
 
     public class AggregatedMatcher : Matcher
     {
