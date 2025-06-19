@@ -1,0 +1,181 @@
+﻿#nullable enable
+using System;
+using System.Runtime.CompilerServices;
+using System.Security;
+using System.Threading;
+
+namespace ServeSharp.Core.Middleware
+{
+    // Middleware is a Task-like Awaiter that implements a function call chain where parent functions can execute anything before and after the child functions.
+    [AsyncMethodBuilder(typeof(MiddlewareMethodBuilder))]
+    public class Middleware : ICriticalNotifyCompletion
+    {
+        // Signals the end of the "before" hook
+        private readonly CancellationToken _ctTopHalf;
+        // Signals the end of the "after" hook; unused for now
+        private readonly CancellationToken _ctLowerHalf;
+        // Contains the exception from the "before" hook; required for Awaiter to bubble up the exception to the caller
+        private Exception? _exception;
+
+        internal Middleware(CancellationToken ctTopHalf, CancellationToken ctLowerHalf)
+        {
+            _ctTopHalf = ctTopHalf;
+            _ctLowerHalf = ctLowerHalf;
+        }
+
+        // IsCompleted should always return false, so that the parent AsyncMethodBuilder calls our OnCompleted method.
+        public bool IsCompleted => false;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Middleware GetAwaiter() => this;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void GetResult()
+        {
+            lock (this)
+            {
+                if (_exception != null)
+                {
+                    throw _exception;
+                }
+            }
+            _ctTopHalf.WaitHandle.WaitOne();
+        }
+
+        // Required by AsyncMethodBuilder
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void SetException(Exception exception)
+        {
+            lock (this)
+            {
+                _exception = exception;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Exception? GetException()
+        {
+            lock (this)
+            {
+                return _exception;
+            }
+        }
+
+        // Execute anything after us in the current thread
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void OnCompleted(Action completion) => completion();
+
+        // Execute anything after us in the current thread
+        [SecuritySafeCritical]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void UnsafeOnCompleted(Action completion) => completion();
+    }
+
+    public class MiddlewareMethodBuilder
+    {
+        private readonly CancellationTokenSource _ctsTopHalf = new CancellationTokenSource();
+        private readonly CancellationTokenSource _ctsLowerHalf =  new CancellationTokenSource();
+
+        public MiddlewareMethodBuilder()
+        {
+            Task = new Middleware(_ctsTopHalf.Token, _ctsLowerHalf.Token);
+        }
+        public Middleware Task { get; }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MiddlewareMethodBuilder Create() => new MiddlewareMethodBuilder();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Start<TStateMachine>(ref TStateMachine stateMachine)
+            where TStateMachine : IAsyncStateMachine => stateMachine.MoveNext();
+
+        // Not used when we are a class
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetStateMachine(IAsyncStateMachine stateMachine) { }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetException(Exception exception)
+        {
+            Task.SetException(exception);
+            SignalBottomHalfDone();
+        }
+
+        // Mark the whole task as completed
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetResult()
+        {
+            SignalBottomHalfDone();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SignalTopHalfDone(DeferrableAwaiter da, Action completion)
+        {
+            lock (this)
+            {
+                if (_ctsTopHalf.IsCancellationRequested)
+                {
+                    throw new InvalidOperationException("Can't await next twice");
+                }
+
+                // queue the lower half
+                da.Defer(() =>
+                {
+                    completion();
+                    _ctsLowerHalf.Token.WaitHandle.WaitOne();
+                });
+
+                // signal the await to return now
+                _ctsTopHalf.Cancel();
+            }
+        }
+
+        // This method might be invoked twice if the middleware does not call await Next.
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SignalBottomHalfDone()
+        {
+            lock (this)
+            {
+                _ctsTopHalf.Cancel();
+                _ctsLowerHalf.Cancel();
+                var ex = Task.GetException();
+                if (ex != null)
+                {
+                    throw ex;
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AwaitOnCompleted<TAwaiter, TStateMachine>(
+            ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : INotifyCompletion
+            where TStateMachine : IAsyncStateMachine
+        {
+            if (awaiter is DeferrableAwaiter da)
+            {
+                SignalTopHalfDone(da, stateMachine.MoveNext);
+            }
+            else
+            {
+                awaiter.OnCompleted(stateMachine.MoveNext);
+            }
+        } 
+
+        [SecuritySafeCritical]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(
+            ref TAwaiter awaiter, ref TStateMachine stateMachine)
+            where TAwaiter : ICriticalNotifyCompletion
+            where TStateMachine : IAsyncStateMachine
+        {
+            if (awaiter is DeferrableAwaiter da)
+            {
+                SignalTopHalfDone(da, stateMachine.MoveNext);
+            }
+            else
+            {
+                awaiter.UnsafeOnCompleted(stateMachine.MoveNext);
+            }
+        }
+    }
+}
