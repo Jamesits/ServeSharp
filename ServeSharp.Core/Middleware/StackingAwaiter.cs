@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ServeSharp.Core.Middleware
 {    
-    // DeferrableAwaiter, when awaited, folds all the code after the await line into a stack. When it is disposed,
+    // StackingAwaiter, when awaited, folds all the code after the await line into a stack. When it is disposed,
     // the deferred code are executed in reverse order. 
     // Deferred execution is synchronous. The `async` grammar is only used as a synthetic sugar.
-    public class DeferrableAwaiter : ICriticalNotifyCompletion, IDisposable, IAsyncDisposable
+    public class StackingAwaiter : ICriticalNotifyCompletion, IDisposable, IAsyncDisposable
     {
         // Prevents invocation after disposal
         private bool _completed;
@@ -35,7 +35,7 @@ namespace ServeSharp.Core.Middleware
             {
                 if (_completed)
                 {
-                    throw new InvalidOperationException("Use of DeferrableAwaiter after disposal");
+                    throw new InvalidOperationException("Use of StackingAwaiter after disposal");
                 }
                 _completions.Push(action);
             }
@@ -83,7 +83,7 @@ namespace ServeSharp.Core.Middleware
         #region impl of Task type (Awaitable expressions)
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DeferrableAwaiter GetAwaiter() => this;
+        public StackingAwaiter GetAwaiter() => this;
 
         #endregion
 

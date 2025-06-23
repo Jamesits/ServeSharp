@@ -1,9 +1,10 @@
 using ServeSharp.Core.Middleware;
 using System.Collections.Concurrent;
+using Task = System.Threading.Tasks.Task;
 
 namespace ServeSharp.Core.Test
 {
-    public class MiddlewareTest
+    public class MiddlewareTaskTest
     {
         [SetUp]
         public void Setup()
@@ -20,10 +21,10 @@ namespace ServeSharp.Core.Test
             ], [101, 102, 103, 201, 301, 302, 303, 304, 209, 208, 109]);
         }
 
-        private async Task ExecuteMiddlewareStack(Func<DeferrableAwaiter, ConcurrentQueue<int>, Middleware.Middleware>[] stack, int[] expectedSeq)
+        private async Task ExecuteMiddlewareStack(Func<StackingAwaiter, ConcurrentQueue<int>, Middleware.Task>[] stack, int[] expectedSeq)
         {
             var resultQueue = new ConcurrentQueue<int>();
-            var next = new DeferrableAwaiter();
+            var next = new StackingAwaiter();
             await using (next)
             {
                 foreach (var i in stack)
@@ -41,7 +42,7 @@ namespace ServeSharp.Core.Test
             }
         }
 
-        private async Middleware.Middleware PlainChainedMiddleware1(DeferrableAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainChainedMiddleware1(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(101);
             await Task.Yield();
@@ -52,7 +53,7 @@ namespace ServeSharp.Core.Test
             resultQueue.Enqueue(109);
         }
 
-        private async Middleware.Middleware PlainChainedMiddleware2(DeferrableAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainChainedMiddleware2(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(201);
             await next;
@@ -61,7 +62,7 @@ namespace ServeSharp.Core.Test
             resultQueue.Enqueue(208);
         }
 
-        private async Middleware.Middleware PlainTerminatingMiddleware1(DeferrableAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainTerminatingMiddleware1(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(301);
 

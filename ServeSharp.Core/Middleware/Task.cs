@@ -6,9 +6,9 @@ using System.Threading;
 
 namespace ServeSharp.Core.Middleware
 {
-    // Middleware is a Task-like Awaiter that implements a function call chain where parent functions can execute anything before and after the child functions.
-    [AsyncMethodBuilder(typeof(MiddlewareMethodBuilder))]
-    public class Middleware : ICriticalNotifyCompletion
+    // Task is a Task-like Awaiter that implements a function call chain where parent functions can execute anything before and after the child functions.
+    [AsyncMethodBuilder(typeof(TaskAsyncMethodBuilder))]
+    public class Task : ICriticalNotifyCompletion
     {
         // Signals the end of the "before" hook
         private readonly CancellationToken _ctTopHalf;
@@ -17,7 +17,7 @@ namespace ServeSharp.Core.Middleware
         // Contains the exception from the "before" hook; required for Awaiter to bubble up the exception to the caller
         private Exception? _exception;
 
-        internal Middleware(CancellationToken ctTopHalf, CancellationToken ctLowerHalf)
+        internal Task(CancellationToken ctTopHalf, CancellationToken ctLowerHalf)
         {
             _ctTopHalf = ctTopHalf;
             _ctLowerHalf = ctLowerHalf;
@@ -27,7 +27,7 @@ namespace ServeSharp.Core.Middleware
         public bool IsCompleted => false;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Middleware GetAwaiter() => this;
+        public Task GetAwaiter() => this;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void GetResult()
@@ -71,19 +71,19 @@ namespace ServeSharp.Core.Middleware
         public void UnsafeOnCompleted(Action completion) => completion();
     }
 
-    public class MiddlewareMethodBuilder
+    public class TaskAsyncMethodBuilder
     {
         private readonly CancellationTokenSource _ctsTopHalf = new CancellationTokenSource();
         private readonly CancellationTokenSource _ctsLowerHalf =  new CancellationTokenSource();
 
-        public MiddlewareMethodBuilder()
+        public TaskAsyncMethodBuilder()
         {
-            Task = new Middleware(_ctsTopHalf.Token, _ctsLowerHalf.Token);
+            Task = new Task(_ctsTopHalf.Token, _ctsLowerHalf.Token);
         }
-        public Middleware Task { get; }
+        public Task Task { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static MiddlewareMethodBuilder Create() => new MiddlewareMethodBuilder();
+        public static TaskAsyncMethodBuilder Create() => new TaskAsyncMethodBuilder();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Start<TStateMachine>(ref TStateMachine stateMachine)
@@ -110,7 +110,7 @@ namespace ServeSharp.Core.Middleware
 
         // Signal that we reached an `await next`
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void SignalTopHalfDone(DeferrableAwaiter da, Action completion)
+        private void SignalTopHalfDone(StackingAwaiter da, Action completion)
         {
             lock (this)
             {
@@ -154,7 +154,7 @@ namespace ServeSharp.Core.Middleware
             where TAwaiter : INotifyCompletion
             where TStateMachine : IAsyncStateMachine
         {
-            if (awaiter is DeferrableAwaiter da)
+            if (awaiter is StackingAwaiter da)
             {
                 SignalTopHalfDone(da, stateMachine.MoveNext);
             }
@@ -171,7 +171,7 @@ namespace ServeSharp.Core.Middleware
             where TAwaiter : ICriticalNotifyCompletion
             where TStateMachine : IAsyncStateMachine
         {
-            if (awaiter is DeferrableAwaiter da)
+            if (awaiter is StackingAwaiter da)
             {
                 SignalTopHalfDone(da, stateMachine.MoveNext);
             }

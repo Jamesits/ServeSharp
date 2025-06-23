@@ -5,6 +5,10 @@
     <Nullable>enable</Nullable>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest-all</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>

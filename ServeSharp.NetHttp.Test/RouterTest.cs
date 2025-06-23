@@ -1,4 +1,6 @@
-﻿using ServeSharp.Core.Middleware;
+﻿using ServeSharp.Core.Context;
+using ServeSharp.Core.Middleware;
+using Task = ServeSharp.Core.Middleware.Task;
 
 namespace ServeSharp.NetHttp.Test;
 
@@ -15,17 +17,17 @@ public class RouterTest
 
         _router.Use(async (context, next) =>
         {
-            Console.WriteLine("Middleware 1 enter");
+            Console.WriteLine("Task 1 enter");
             await next;
-            Console.WriteLine("Middleware 1 exit");
+            Console.WriteLine("Task 1 exit");
         });
         _router.Use(async (context, next) =>
         {
-            Console.WriteLine("Middleware 2 enter");
+            Console.WriteLine("Task 2 enter");
             // throw new NotImplementedException();
             await next;
             // throw new NotImplementedException();
-            Console.WriteLine("Middleware 2 exit");
+            Console.WriteLine("Task 2 exit");
         });
 
         _router.Get("/root", async (context, _) => Console.WriteLine("Get root"));
@@ -38,28 +40,24 @@ public class RouterTest
     }
 
     [Test]
-    public async Task TestGet1()
+    public async System.Threading.Tasks.Task TestGet1()
     {
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com/root");
-        using var ctx = new Context()
-        {
-            Request = msg,
-        };
+        using var ctx = new Context();
+        ctx.Get<IHttp>().Request = msg;
         await _router.Handle(ctx);
     }
 
     [Test]
-    public async Task TestPost1()
+    public async System.Threading.Tasks.Task TestPost1()
     {
-        var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
-        using var ctx = new Context()
-        {
-            Request = msg,
-        };
+        var msg = new HttpRequestMessage(HttpMethod.Post, "https://google.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
+        using var ctx = new Context();
+        ctx.Get<IHttp>().Request = msg;
         await _router.Handle(ctx);
     }
 
-    public static async Middleware recovery(Context context, DeferrableAwaiter next)
+    public static async Task recovery(Context context, StackingAwaiter next)
     {
         Console.WriteLine("Recovery enter");
 

@@ -2,6 +2,14 @@
   "version": 1,
   "dependencies": {
     ".NETStandard,Version=v2.1": {
+      "Castle.Core": {
+        "type": "Transitive",
+        "resolved": "5.2.1",
+        "contentHash": "wHARzQA695jwwKreOzNsq54KiGqKP38tv8hi8e2FXDEC/sA6BtrX90tVPDkOfVu13PbEzr00TCV8coikl+D1Iw==",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "4.7.0"
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
         "resolved": "9.0.4",
@@ -29,6 +37,14 @@
         "dependencies": {
           "System.Memory": "4.5.4",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "4.7.0",
+        "contentHash": "iDoKGQcRwX0qwY+eAEkaJGae0d/lHlxtslO+t8pJWAUxlvY3tqLtVOPnW2UU4cFjP0Y/L1QBqhkZfSyGqVMR2w==",
+        "dependencies": {
+          "System.Security.Principal.Windows": "4.7.0"
         }
       },
       "System.IO.Pipelines": {
@@ -60,6 +76,11 @@
         "type": "Transitive",
         "resolved": "6.0.0",
         "contentHash": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg=="
+      },
+      "System.Security.Principal.Windows": {
+        "type": "Transitive",
+        "resolved": "4.7.0",
+        "contentHash": "ojD0PX0XhneCsUbAZVKdb7h/70vyYMDYs85lwEI+LngEONe/17A0cFaRFqZU+sOEidcVswYWikYOQ9PPfjlbtQ=="
       },
       "System.Text.Encodings.Web": {
         "type": "Transitive",
@@ -101,6 +122,7 @@
       "servesharp.core": {
         "type": "Project",
         "dependencies": {
+          "Castle.Core": "[5.2.1, )",
           "sly": "[3.7.3, )"
         }
       }

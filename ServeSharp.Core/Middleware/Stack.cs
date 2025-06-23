@@ -4,22 +4,22 @@ using System.Collections.Generic;
 
 namespace ServeSharp.Core.Middleware
 {
-    public delegate Middleware HandleFunc<in T>(T context, DeferrableAwaiter next);
+    public delegate Task HandleFunc<in T>(T context, StackingAwaiter next);
 
-    public class HandlerStack<T>
+    public class Stack<T>
     {
         private readonly List<HandleFunc<T>> _handles = new List<HandleFunc<T>>();
 
-        public HandlerStack() { }
+        public Stack() { }
 
-        public HandlerStack(params HandleFunc<T>[] handles)
+        public Stack(params HandleFunc<T>[] handles)
         {
             _handles.AddRange(handles);
         }
 
         public void Add(params HandleFunc<T>[] handles) => _handles.AddRange(handles);
 
-        public async Middleware Handle(T context, DeferrableAwaiter next)
+        public async Task Handle(T context, StackingAwaiter next)
         {
             foreach (var h in _handles)
             {

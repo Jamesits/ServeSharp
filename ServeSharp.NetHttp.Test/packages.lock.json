@@ -39,6 +39,14 @@
         "resolved": "4.5.0",
         "contentHash": "s8JpqTe9bI2f49Pfr3dFRfoVSuFQyraTj68c3XXjIS/MRGvvkLnrg6RLqnTjdShX+AdFUCCU/4Xex58AdUfs6A=="
       },
+      "Castle.Core": {
+        "type": "Transitive",
+        "resolved": "5.2.1",
+        "contentHash": "wHARzQA695jwwKreOzNsq54KiGqKP38tv8hi8e2FXDEC/sA6BtrX90tVPDkOfVu13PbEzr00TCV8coikl+D1Iw==",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "6.0.0"
+        }
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "17.8.0",
@@ -103,6 +111,11 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         }
       },
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw=="
+      },
       "System.IO.Pipelines": {
         "type": "Transitive",
         "resolved": "9.0.4",
@@ -140,6 +153,7 @@
       "servesharp.core": {
         "type": "Project",
         "dependencies": {
+          "Castle.Core": "[5.2.1, )",
           "sly": "[3.7.3, )"
         }
       },
