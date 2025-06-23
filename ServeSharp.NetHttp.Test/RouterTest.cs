@@ -1,5 +1,4 @@
-﻿using ServeSharp.Core.Context;
-using ServeSharp.Core.Middleware;
+﻿using ServeSharp.Core.Middleware;
 using Task = ServeSharp.Core.Middleware.Task;
 
 namespace ServeSharp.NetHttp.Test;
@@ -44,7 +43,7 @@ public class RouterTest
     {
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com/root");
         using var ctx = new Context();
-        ctx.Get<IHttp>().Request = msg;
+        ctx.Http.Request = msg;
         await _router.Handle(ctx);
     }
 
@@ -53,7 +52,7 @@ public class RouterTest
     {
         var msg = new HttpRequestMessage(HttpMethod.Post, "https://google.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
         using var ctx = new Context();
-        ctx.Get<IHttp>().Request = msg;
+        ctx.Http.Request = msg;
         await _router.Handle(ctx);
     }
 

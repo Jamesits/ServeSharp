@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Net.Http;
-using ServeSharp.Core.Context;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 
@@ -19,17 +18,16 @@ namespace ServeSharp.NetHttp
 
         public bool Match(Context context)
         {
-            var http = context.Get<IHttp>();
-            if (http?.Request == null)
+            if (context?.Http?.Request == null)
             {
                 throw new InvalidOperationException("Request is null");
             }
 
             // test method
-            if (Method != http.Request.Method) return false;
+            if (Method != context.Http.Request.Method) return false;
 
             // test path
-            return Matcher.Match(http.Request.RequestUri.AbsolutePath, out _, out _);
+            return Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out _);
         }
     }
 }
