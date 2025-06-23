@@ -64,7 +64,7 @@ namespace ServeSharp.NetHttp
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private static async Task DefaultNotFoundHandler(Context context, StackingAwaiter next)
+        private static async Task DefaultNotFoundHandler(Context context, IAwaitable next)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             Console.WriteLine("404 NOT FOUND");

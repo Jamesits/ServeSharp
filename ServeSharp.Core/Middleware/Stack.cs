@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ServeSharp.Core.Middleware
 {
-    public delegate Task HandleFunc<in T>(T context, StackingAwaiter next);
+    public delegate Task HandleFunc<in T>(T context, IAwaitable next);
 
     public class Stack<T>
     {

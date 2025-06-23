@@ -56,7 +56,7 @@ public class RouterTest
         await _router.Handle(ctx);
     }
 
-    public static async Task recovery(Context context, StackingAwaiter next)
+    public static async Task recovery(Context context, IAwaitable next)
     {
         Console.WriteLine("Recovery enter");
 

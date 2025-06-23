@@ -42,7 +42,7 @@ namespace ServeSharp.Core.Test
             }
         }
 
-        private async Middleware.Task PlainChainedMiddleware1(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainChainedMiddleware1(IAwaitable next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(101);
             await Task.Yield();
@@ -53,7 +53,7 @@ namespace ServeSharp.Core.Test
             resultQueue.Enqueue(109);
         }
 
-        private async Middleware.Task PlainChainedMiddleware2(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainChainedMiddleware2(IAwaitable next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(201);
             await next;
@@ -62,7 +62,7 @@ namespace ServeSharp.Core.Test
             resultQueue.Enqueue(208);
         }
 
-        private async Middleware.Task PlainTerminatingMiddleware1(StackingAwaiter next, ConcurrentQueue<int> resultQueue)
+        private async Middleware.Task PlainTerminatingMiddleware1(IAwaitable next, ConcurrentQueue<int> resultQueue)
         {
             resultQueue.Enqueue(301);
 
