@@ -1,24 +1,14 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ServeSharp.NetHttp
 {
-    public static class BinaryWriterExtension
-    {
-        public static void WriteString(this BinaryWriter b, string s)
-        {
-            b?.Write(Encoding.UTF8.GetBytes(s));
-        }
-    }
-
     [Obsolete("For testing only, do not use in production")]
     public class Server
     {
@@ -70,44 +60,7 @@ namespace ServeSharp.NetHttp
                 context.Http.Response = new HttpResponseMessage();
                 await Router.Handle(context);
 
-                using var m = new MemoryStream();
-                await using var writer = new BinaryWriter(m, Encoding.UTF8);
-                writer.WriteString($"HTTP/1.1 {(int)(context.Http.Response.StatusCode)} {context.Http.Response.ReasonPhrase}\r\n");
-                // var str = System.Text.Encoding.Default.GetString(m.ToArray());
-
-                foreach (var h in context.Http.Response.Headers)
-                {
-                    foreach (var value in h.Value)
-                    {
-                        writer.WriteString($"{h.Key}: {value}\r\n");
-                    }
-                }
-                foreach (var h in context.Http.Response.Content.Headers)
-                {
-                    foreach (var value in h.Value)
-                    {
-                        writer.WriteString($"{h.Key}: {value}\r\n");
-                    }
-                }
-                foreach (var h in context.Http.Response.TrailingHeaders)
-                {
-                    foreach (var value in h.Value)
-                    {
-                        writer.WriteString($"{h.Key}: {value}\r\n");
-                    }
-                }
-                writer.WriteString("\r\n");
-
-                if (context.Http.Response.Content != null)
-                {
-                    var buf = await context.Http.Response.Content.ReadAsByteArrayAsync();
-                    writer.Write(buf);
-                    writer.WriteString("\r\n\r\n");
-                }
-                writer.Flush();
-                await m.FlushAsync();
-                
-                await conn.SendAsync(m.ToArray(), SocketFlags.None);
+                await conn.SendAsync(await context.Http.Response.ToByteArray(), SocketFlags.None);
                 conn.Close();
             }
         }

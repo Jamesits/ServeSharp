@@ -82,6 +82,46 @@ public class PathParserTest
         AssertNonMatchPath(ret.Result, "/path1/child%aa%bb/114514/path2/path3.html");
     }
 
+    [Test]
+    public void TestRegexMatchingMultipleSegmentsWithoutEnding()
+    {
+        var src = @"/path1/{anything: /.*/}";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb/", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb/"},
+        });
+    }
+
+    [Test]
+    public void TestRegexMatchingMultipleSegmentsWithEnding()
+    {
+        var src = @"/path1/{anything: /.*/}/path2/path3";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+
+        AssertMatchPath(ret.Result, "/path1/aaa/path2/path3", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb/path2/path3/", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1/aaa/path2/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/path2/path");
+    }
+
     private void AssertMatchPath(Matcher matcher, string path, string expectedRemainder, Dictionary<string, string>? expectedBindings)
     {
         var match = matcher.Match(path, out var remainder, out var bindings);
