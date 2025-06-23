@@ -126,6 +126,75 @@
           "sly": "[3.7.3, )"
         }
       }
+    },
+    "net8.0": {
+      "Castle.Core": {
+        "type": "Transitive",
+        "resolved": "5.2.1",
+        "contentHash": "wHARzQA695jwwKreOzNsq54KiGqKP38tv8hi8e2FXDEC/sA6BtrX90tVPDkOfVu13PbEzr00TCV8coikl+D1Iw==",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "6.0.0"
+        }
+      },
+      "sly": {
+        "type": "Transitive",
+        "resolved": "3.7.3",
+        "contentHash": "g+w2nk4LdULjGyxJv7glwNuQvqPe8cPi/JDNg431ZBXK3/x3yCZHCYxvC+gDWNaK1clc48bo82Aha6UTLoNUYw==",
+        "dependencies": {
+          "System.Collections.Immutable": "6.0.0",
+          "System.Text.Json": "9.0.4",
+          "System.ValueTuple": "4.6.0"
+        }
+      },
+      "System.Collections.Immutable": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "l4zZJ1WU2hqpQQHXz1rvC3etVZN+2DLmQMO79FhOTZHMn8tDRr+WU287sbomD0BETlmKDn0ygUgVy9k5xkkJdA==",
+        "dependencies": {
+          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+        }
+      },
+      "System.Diagnostics.EventLog": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw=="
+      },
+      "System.IO.Pipelines": {
+        "type": "Transitive",
+        "resolved": "9.0.4",
+        "contentHash": "luF2Xba+lTe2GOoNQdZLe8q7K6s7nSpWZl9jIwWNMszN4/Yv0lmxk9HISgMmwdyZ83i3UhAGXaSY9o6IJBUuuA=="
+      },
+      "System.Runtime.CompilerServices.Unsafe": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "/iUeP3tq1S0XdNNoMz5C9twLSrM/TH+qElHkXWaPvuNOt+99G75NrV0OS2EqHx5wMN7popYjpc8oTjC1y16DLg=="
+      },
+      "System.Text.Encodings.Web": {
+        "type": "Transitive",
+        "resolved": "9.0.4",
+        "contentHash": "V+5cCPpk1S2ngekUs9nDrQLHGiWFZMg8BthADQr+Fwi59a8DdHFu26S2oi9Bfgv+d67bqmkPqctJXMEXiimXUg=="
+      },
+      "System.Text.Json": {
+        "type": "Transitive",
+        "resolved": "9.0.4",
+        "contentHash": "pYtmpcO6R3Ef1XilZEHgXP2xBPVORbYEzRP7dl0IAAbN8Dm+kfwio8aCKle97rAWXOExr292MuxWYurIuwN62g==",
+        "dependencies": {
+          "System.IO.Pipelines": "9.0.4",
+          "System.Text.Encodings.Web": "9.0.4"
+        }
+      },
+      "System.ValueTuple": {
+        "type": "Transitive",
+        "resolved": "4.6.0",
+        "contentHash": "/5KsV85mg+o8HMgO8k/BzBlyt3ukSExF6yYqKrjT+JxG8rdu6F04g7/Emq+tDhQg2KOtVwRmcrFGouXi/iPKBA=="
+      },
+      "servesharp.core": {
+        "type": "Project",
+        "dependencies": {
+          "Castle.Core": "[5.2.1, )",
+          "sly": "[3.7.3, )"
+        }
+      }
     }
   }
 }
