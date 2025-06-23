@@ -15,16 +15,16 @@ namespace ServeSharp.NetHttp
         private readonly List<Route> _routes = new List<Route>();
         private readonly Parser<RouteToken, Matcher> _parser = Parser.New();
         private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
-        private string _groupParentPath = "";
 
         public bool AutoHead { get; set; } = true;
         public HandleFunc<Context> NotFound { internal get; set; } = DefaultNotFoundHandler;
 
         public void Use(params HandleFunc<Context>[] middleware) => _middlewares.AddRange(middleware);
 
-        public IPathGroup<Context, Route> Group(string path) => new Router()
+        public IPathGroup<Context, Route> Group(string path) => new RouteGroup()
         {
-            _groupParentPath = path,
+            _parent = this,
+            _path = path,
         };
 
         internal Route Route(Route route)
@@ -40,7 +40,7 @@ namespace ServeSharp.NetHttp
 
             var ret = new Route()
             {
-                OriginalRouteDefinition = _groupParentPath + path,
+                OriginalRouteDefinition = path,
                 Method = method,
                 Matcher = pr.Result,
                 Handler = handler,

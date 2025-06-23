@@ -5,12 +5,10 @@ namespace ServeSharp.Core.Path
 {
     public interface IPathGroup<out TContext, out TRoute>
     {
-        public bool AutoHead { get; set; }
-
         // currently not inheritable
+        // public bool AutoHead { get; set; }
         // public HandleFunc<TContext> NotFound { set; }
-
-        public void Use(params HandleFunc<TContext>[] middleware);
+        // public void Use(params HandleFunc<TContext>[] middleware);
         public IPathGroup<TContext, TRoute> Group(string path);
 
         public TRoute Route(HttpMethod method, string path, HandleFunc<TContext> handler);
