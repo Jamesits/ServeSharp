@@ -1,5 +1,4 @@
 ﻿using ServeSharp.Core.Middleware;
-using Task = ServeSharp.Core.Middleware.Task;
 
 namespace ServeSharp.NetHttp.Test;
 
@@ -16,17 +15,17 @@ public class RouterTest
 
         _router.Use(async (context, next) =>
         {
-            Console.WriteLine("Task 1 enter");
+            Console.WriteLine("Middleware 1 enter");
             await next;
-            Console.WriteLine("Task 1 exit");
+            Console.WriteLine("Middleware 1 exit");
         });
         _router.Use(async (context, next) =>
         {
-            Console.WriteLine("Task 2 enter");
+            Console.WriteLine("Middleware 2 enter");
             // throw new NotImplementedException();
             await next;
             // throw new NotImplementedException();
-            Console.WriteLine("Task 2 exit");
+            Console.WriteLine("Middleware 2 exit");
         });
 
         _router.Get("/root", async (context, _) => Console.WriteLine("Get root"));
@@ -39,7 +38,7 @@ public class RouterTest
     }
 
     [Test]
-    public async System.Threading.Tasks.Task TestGet1()
+    public async Task TestGet1()
     {
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com/root");
         using var ctx = new Context();
@@ -48,7 +47,7 @@ public class RouterTest
     }
 
     [Test]
-    public async System.Threading.Tasks.Task TestPost1()
+    public async Task TestPost1()
     {
         var msg = new HttpRequestMessage(HttpMethod.Post, "https://google.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
         using var ctx = new Context();
@@ -56,7 +55,7 @@ public class RouterTest
         await _router.Handle(ctx);
     }
 
-    public static async Task recovery(Context context, IAwaitable next)
+    public static async Middleware recovery(Context context, IAwaitable next)
     {
         Console.WriteLine("Recovery enter");
 

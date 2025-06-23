@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using Castle.Components.DictionaryAdapter;
 
 namespace ServeSharp.Core.Path
 {
@@ -20,6 +21,21 @@ namespace ServeSharp.Core.Path
 
             src.ToList().ForEach(item => dst.Add(item.Key, item.Value));
             return dst;
+        }
+
+        public static bool Equal<TKey, TValue>(this Dictionary<TKey, TValue>? current, Dictionary<TKey, TValue>? other)
+        {
+            if (current == null && other == null)
+            {
+                return true;
+            }
+
+            if (current == null || other == null)
+            {
+                return false;
+            }
+
+            return current.OrderBy(x => x.Key).SequenceEqual(other.OrderBy(x => x.Key));
         }
     }
 }

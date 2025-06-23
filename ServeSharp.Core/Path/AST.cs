@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -55,6 +56,12 @@ namespace ServeSharp.Core.Path
 
             foreach (var m in _matchers)
             {
+                // nothing left to match, but there are matchers
+                if (remainder.Length == 0)
+                {
+                    return false;
+                }
+
                 // every child matcher must start and end with a "/"
                 if (remainder[0] != '/')
                 {
@@ -157,14 +164,14 @@ namespace ServeSharp.Core.Path
             // regex unset; match ends before the first "/"
             if (_regex == null)
             {
-                var cutPtr = path.IndexOf("/", StringComparison.Ordinal);
+                var cutPtr = path.IndexOf('/', StringComparison.Ordinal);
                 if (cutPtr == -1)
                 {
                     remainder = "";
                 }
                 else
                 {
-                    remainder = path.Substring(cutPtr);
+                    remainder = path[cutPtr..];
                     path = path.Remove(cutPtr);
                 }
 

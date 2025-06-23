@@ -5,7 +5,6 @@ using System.Linq;
 using ServeSharp.Core.Middleware;
 using System.Net.Http;
 using System.Text;
-using ServeSharp.Core.Context;
 using ServeSharp.Core.Path;
 using sly.parser;
 
@@ -49,7 +48,7 @@ namespace ServeSharp.NetHttp
         public void Head(string path, HandleFunc<Context> handler) => Route(HttpMethod.Head, path, handler);
         public void Trace(string path, HandleFunc<Context> handler) => Route(HttpMethod.Trace, path, handler);
 
-        public async Task Handle(Context context)
+        public async Middleware Handle(Context context)
         {
 #pragma warning disable CA2007
             // StackingAwaiter must be created here so that task continuations are flattened to this level.
@@ -57,14 +56,14 @@ namespace ServeSharp.NetHttp
 #pragma warning restore CA2007
             
             var handleFunc = _routes.Where(route => route.Match(context)).Select<Route, HandleFunc<Context>>(route => route.Handler).FirstOrDefault() ?? NotFound;
-            var stack = new Core.Middleware.Stack<Context>(_middlewares.ToArray());
+            var stack = new MiddlewareStack<Context>(_middlewares.ToArray());
             stack.Add(handleFunc);
 
             await stack.Handle(context, next);
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private static async Task DefaultNotFoundHandler(Context context, IAwaitable next)
+        private static async Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             Console.WriteLine("404 NOT FOUND");
