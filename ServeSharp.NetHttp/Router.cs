@@ -10,43 +10,57 @@ using sly.parser;
 
 namespace ServeSharp.NetHttp
 {
-    public class Router
+    public class Router : IPathGroup<Context, Route>
     {
         private readonly List<Route> _routes = new List<Route>();
         private readonly Parser<RouteToken, Matcher> _parser = Parser.New();
         private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
+        private string _groupParentPath = "";
 
         public bool AutoHead { get; set; } = true;
-        public HandleFunc<Context> NotFound { get; set; } = DefaultNotFoundHandler;
+        public HandleFunc<Context> NotFound { internal get; set; } = DefaultNotFoundHandler;
 
         public void Use(params HandleFunc<Context>[] middleware) => _middlewares.AddRange(middleware);
 
-        public void Route(HttpMethod method, string path, HandleFunc<Context> handler)
+        public IPathGroup<Context, Route> Group(string path) => new Router()
+        {
+            _groupParentPath = path,
+        };
+
+        internal Route Route(Route route)
+        {
+            _routes.Add(route);
+            return route;
+        }
+
+        public Route Route(HttpMethod method, string path, HandleFunc<Context> handler)
         {
             var pr = _parser.Parse(path);
             pr.ThrowIfError();
 
-            _routes.Add(new Route()
+            var ret = new Route()
             {
-                OriginalRouteDefinition = path,
+                OriginalRouteDefinition = _groupParentPath + path,
                 Method = method,
                 Matcher = pr.Result,
                 Handler = handler,
-            });
+            };
+
+            return Route(ret);
         }
 
-        public void Get(string path, HandleFunc<Context> handler)
+        public Route Get(string path, HandleFunc<Context> handler)
         {
-            Route(HttpMethod.Get, path, handler);
             if (AutoHead) Route(HttpMethod.Head, path, handler);
+            return Route(HttpMethod.Get, path, handler);
         }
-        public void Patch(string path, HandleFunc<Context> handler) => Route(HttpMethod.Patch, path, handler);
-        public void Post(string path, HandleFunc<Context> handler) => Route(HttpMethod.Post, path, handler);
-        public void Put(string path, HandleFunc<Context> handler) => Route(HttpMethod.Put, path, handler);
-        public void Delete(string path, HandleFunc<Context> handler) => Route(HttpMethod.Delete, path, handler);
-        public void Options(string path, HandleFunc<Context> handler) => Route(HttpMethod.Options, path, handler);
-        public void Head(string path, HandleFunc<Context> handler) => Route(HttpMethod.Head, path, handler);
-        public void Trace(string path, HandleFunc<Context> handler) => Route(HttpMethod.Trace, path, handler);
+        public Route Patch(string path, HandleFunc<Context> handler) => Route(HttpMethod.Patch, path, handler);
+        public Route Post(string path, HandleFunc<Context> handler) => Route(HttpMethod.Post, path, handler);
+        public Route Put(string path, HandleFunc<Context> handler) => Route(HttpMethod.Put, path, handler);
+        public Route Delete(string path, HandleFunc<Context> handler) => Route(HttpMethod.Delete, path, handler);
+        public Route Options(string path, HandleFunc<Context> handler) => Route(HttpMethod.Options, path, handler);
+        public Route Head(string path, HandleFunc<Context> handler) => Route(HttpMethod.Head, path, handler);
+        public Route Trace(string path, HandleFunc<Context> handler) => Route(HttpMethod.Trace, path, handler);
 
         public async Middleware Handle(Context context)
         {

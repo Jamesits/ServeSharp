@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 
@@ -10,6 +11,8 @@ namespace ServeSharp.NetHttp
         public HttpRequestMessage? Request { get; internal set; }
 
         public HttpResponseMessage? Response { get; internal set; }
+
+        public Dictionary<string, string>? UrlBindings { get; internal set; }
     }
 
     public class Context : ServeSharp.Core.Context.Context

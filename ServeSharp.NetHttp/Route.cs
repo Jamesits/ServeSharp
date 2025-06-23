@@ -8,7 +8,7 @@ namespace ServeSharp.NetHttp
 {
     public class Route
     {
-        public string Name { get; internal set; } = "UNNAMED";
+        public string Name { get; set; } = "UNNAMED";
         public string OriginalRouteDefinition { get; internal set; } = "";
         public Matcher Matcher { get; internal set; }
         public HttpMethod Method { get; internal set; }
@@ -27,7 +27,9 @@ namespace ServeSharp.NetHttp
             if (Method != context.Http.Request.Method) return false;
 
             // test path
-            return Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out _);
+            var ret = Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out var bindings);
+            context.Http.UrlBindings = bindings;
+            return ret;
         }
     }
 }
