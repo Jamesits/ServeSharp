@@ -37,7 +37,6 @@ public class MiddlewareTest
     {
         _router = new Router();
 
-        // recovery
         _router.Use(CustomContextMiddleware.SetContext);
         _router.Use(CustomContextMiddleware.AssertContext);
 
