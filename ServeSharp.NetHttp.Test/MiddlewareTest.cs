@@ -41,7 +41,10 @@ public class MiddlewareTest
         _router.Use(CustomContextMiddleware.SetContext);
         _router.Use(CustomContextMiddleware.AssertContext);
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         _router.Get("/", async (context, _) => Console.WriteLine("Get root"));
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
         Console.WriteLine(_router);
     }
 

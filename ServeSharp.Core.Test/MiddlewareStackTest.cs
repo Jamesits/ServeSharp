@@ -242,10 +242,12 @@ public class MiddlewareStackTest
         context.Enqueue(209);
     }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private static async Middleware.Middleware PlainTerminatingMiddlewareAsync(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(301);
     }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
     private static Middleware.Middleware PlainTerminatingMiddlewareSync(ConcurrentQueue<int> context, IAwaitable next)
     {
@@ -253,11 +255,13 @@ public class MiddlewareStackTest
         return Middleware.Middleware.CompletedTask;
     }
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private static async Middleware.Middleware ExceptionBeforeMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(401);
         throw new InvalidOperationException();
     }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
     private static async Middleware.Middleware ExceptionAfterMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
@@ -299,9 +303,13 @@ public class MiddlewareStackTest
             context.Enqueue(709);
         }
     }
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private static async Middleware.Middleware ExceptionTerminatingMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(801);
         throw new InvalidOperationException();
     }
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
 }
