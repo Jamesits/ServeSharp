@@ -140,7 +140,7 @@ public class PathParserTest
     }
 
     [Test]
-    public void TestSplayAnything()
+    public void TestSplatAnything()
     {
         var src = @"/path1/{anything: splat}";
         var ret = _parser.Parse(src);
@@ -168,7 +168,7 @@ public class PathParserTest
     }
 
     [Test]
-    public void TestSplayAnythingWithEnding()
+    public void TestSplatAnythingWithEnding()
     {
         // Splat is greedy by design, so this path would never match
         var src = @"/path1/{anything: splat}/aaa/bbb";
