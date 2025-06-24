@@ -14,13 +14,12 @@ namespace ServeSharp.NetHttp
     {
         private bool _disposed;
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private Socket _socket;
 
         public Router Router { get; } = new Router();
 
         public async Task ListenAndServe()
         {
-            var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            using var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             var ipEndpoint = new IPEndPoint(IPAddress.Any, 8080);
             socket.Bind(ipEndpoint);
             socket.Listen(1024);

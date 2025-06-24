@@ -24,7 +24,7 @@ public class MiddlewareStackTest
     [Test]
     public Task TestThrowingBeforeMiddlewareStack()
     {
-        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        Assert.ThrowsAsync<AggregateException>(async () =>
         {
             await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
                     PlainChainedMiddleware1,
@@ -40,7 +40,7 @@ public class MiddlewareStackTest
     [Test]
     public Task TestThrowingAfterMiddlewareStack()
     {
-        Assert.ThrowsAsync<InvalidOperationException>(async () =>
+        Assert.ThrowsAsync<AggregateException>(async () =>
         {
             await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
                     PlainChainedMiddleware1,

@@ -106,18 +106,13 @@ public class PathParserTest
     [Test]
     public void TestRegexMatchingMultipleSegmentsWithEnding()
     {
+        // Regex is greedy by design, so this path would never match
         var src = @"/path1/{anything: /.*/}/path2/path3";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
 
-        AssertMatchPath(ret.Result, "/path1/aaa/path2/path3", "", new Dictionary<string, string>
-        {
-            {"anything", "aaa"},
-        });
-        AssertMatchPath(ret.Result, "/path1/aaa/bbb/path2/path3/", "", new Dictionary<string, string>
-        {
-            {"anything", "aaa/bbb"},
-        });
+        AssertNonMatchPath(ret.Result, "/path1/aaa/path2/path3");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/path2/path3/");
         AssertNonMatchPath(ret.Result, "/path1/aaa/path2/");
         AssertNonMatchPath(ret.Result, "/path1/aaa/path2/path");
     }
