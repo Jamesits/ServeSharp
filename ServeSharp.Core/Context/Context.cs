@@ -44,6 +44,14 @@ namespace ServeSharp.Core.Context
                 {
                     foreach (var value in _dict.Values)
                     {
+                        if (value is IAsyncDisposable vad)
+                        {
+                            var task = vad.DisposeAsync();
+                            if (!task.IsCompleted)
+                            {
+                                task.AsTask().GetAwaiter().GetResult();
+                            }
+                        }
                         if (value is IDisposable vd)
                         {
                             vd.Dispose();
