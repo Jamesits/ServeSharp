@@ -12,7 +12,7 @@ namespace ServeSharp.NetHttp
         public string OriginalRouteDefinition { get; internal set; } = "";
         public Matcher Matcher { get; }
         public HttpMethod? Method { get; }
-        private HandleFunc<Context>[] _handlers;
+        private readonly HandleFunc<Context>[] _handlers;
 
         public Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers)
         {

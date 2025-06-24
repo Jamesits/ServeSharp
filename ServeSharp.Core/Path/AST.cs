@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace ServeSharp.Core.Path
 {
+    /// <summary>
+    /// Base class for a simple LL(1) parser tree node.
+    /// </summary>
     public abstract class Matcher
     {
         public virtual bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
@@ -38,6 +41,10 @@ namespace ServeSharp.Core.Path
             return sb.ToString();
         }
 
+        // RootMatcher rules:
+        // - All child matchers must succeed
+        // - There must be nothing left after all child matchers have succeeded
+        // - There must be a '/' between every child matcher
         public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
         {
             remainder = path;
@@ -93,6 +100,7 @@ namespace ServeSharp.Core.Path
 
         public override string ToString() => $"[Segment] {string.Join("", _matchers.Select(m => m.ToString()))}";
 
+        // Every child matcher must succeed on a continuous path
         public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
         {
             binding = null;
