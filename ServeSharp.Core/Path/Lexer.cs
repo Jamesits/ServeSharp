@@ -39,7 +39,7 @@ namespace ServeSharp.Core.Path
 
         [Sugar("(")]
         [Mode("bind")]
-        LBRACKET,
+        BRACKET_L,
 
         [Int]
         [Mode("bind")]
@@ -47,6 +47,6 @@ namespace ServeSharp.Core.Path
 
         [Sugar(")")]
         [Mode("bind")]
-        RBRACKET,
+        BRACKET_R,
     }
 }

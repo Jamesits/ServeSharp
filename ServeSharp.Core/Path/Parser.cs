@@ -58,22 +58,20 @@ namespace ServeSharp.Core.Path
         public Matcher Segment(List<Matcher> m) =>  m.Count == 1 ? m[0] : new AggregatedMatcher(m.ToArray());
 
         // ReSharper disable once StringLiteralTypo
+        // Matches string literal
         [Production("literal: PCHARS+")]
-        public Matcher Literal(List<Token<RouteToken>> pcs)
-        {
-            return new StaticMatcher(string.Concat(pcs.Select(x => x.StringWithoutQuotes)));
-        }
+        public Matcher Literal(List<Token<RouteToken>> pcs) => new StaticMatcher(string.Concat(pcs.Select(x => x.StringWithoutQuotes)));
 
         // "{name}" - matches everything before next '/'
         [Production("binding_segment : BIND_START [d] BIND_DST BIND_END [d]")]
         public Matcher BindingSegment(Token<RouteToken> bindDst) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 1);
 
-        // "{name : splat(N)}" - matches N segments separated by '/'
+        // "{name : splat}" - matches 0 or more characters (use at the end only)
         [Production("binding_splat_any : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] BIND_END [d]")]
         public Matcher BindingSplatCount(Token<RouteToken> bindDst) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 0);
 
         // "{name : splat(N)}" - matches N segments separated by '/'
-        [Production("binding_splat : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] LBRACKET [d] BIND_SPLAT_COUNT RBRACKET [d] BIND_END [d]")]
+        [Production("binding_splat : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] BRACKET_L [d] BIND_SPLAT_COUNT BRACKET_R [d] BIND_END [d]")]
         public Matcher BindingSplatCount(Token<RouteToken> bindDst, Token<RouteToken> splatCount) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, splatCount.IntValue);
 
         // "{name : /regex/}"
