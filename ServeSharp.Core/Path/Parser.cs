@@ -54,7 +54,7 @@ namespace ServeSharp.Core.Path
             return ret;
         }
 
-        [Production("segment : [ literal | binding ]*")]
+        [Production("segment : [ literal | binding_segment | binding_splat_any | binding_splat | binding_regex ]*")]
         public Matcher Segment(List<Matcher> m) =>  m.Count == 1 ? m[0] : new AggregatedMatcher(m.ToArray());
 
         // ReSharper disable once StringLiteralTypo
@@ -64,11 +64,20 @@ namespace ServeSharp.Core.Path
             return new StaticMatcher(string.Concat(pcs.Select(x => x.StringWithoutQuotes)));
         }
 
-        [Production("binding : BIND_START[d] BIND_DST (BIND_SEP [d] BIND_REGEXP)? BIND_END[d]")]
-        public Matcher Binding(Token<RouteToken> bindDst, ValueOption<Group<RouteToken, Matcher>> regexp)
-        {
-            var re = regexp.Match(group => group.Token(0).StringWithoutQuotes, () => null);
-            return new BindingMatcher(bindDst.StringWithoutQuotes, re);
-        }
+        // "{name}" - matches everything before next '/'
+        [Production("binding_segment : BIND_START [d] BIND_DST BIND_END [d]")]
+        public Matcher BindingSegment(Token<RouteToken> bindDst) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 1);
+
+        // "{name : splat(N)}" - matches N segments separated by '/'
+        [Production("binding_splat_any : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] BIND_END [d]")]
+        public Matcher BindingSplatCount(Token<RouteToken> bindDst) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 0);
+
+        // "{name : splat(N)}" - matches N segments separated by '/'
+        [Production("binding_splat : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] LBRACKET [d] BIND_SPLAT_COUNT RBRACKET [d] BIND_END [d]")]
+        public Matcher BindingSplatCount(Token<RouteToken> bindDst, Token<RouteToken> splatCount) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, splatCount.IntValue);
+
+        // "{name : /regex/}"
+        [Production("binding_regex : BIND_START [d] BIND_DST BIND_SEP [d] BIND_REGEXP BIND_END [d]")]
+        public Matcher BindingRegex(Token<RouteToken> bindDst, Token<RouteToken> r) => new BindingRegexMatcher(bindDst.StringWithoutQuotes, r.StringWithoutQuotes);
     }
 }

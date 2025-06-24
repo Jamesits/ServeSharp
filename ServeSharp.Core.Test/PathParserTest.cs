@@ -16,11 +16,25 @@ public class PathParserTest
     }
 
     [Test]
+    public void TestUnparsablePath()
+    {
+        var src = @"/{";
+        var ret = _parser.Parse(src);
+        Console.WriteLine(src);
+        Assert.Throws<AggregateException>(() =>
+        {
+            ret.ThrowIfError();
+        });
+    }
+
+    [Test]
     public void TestRootPath()
     {
         var src = @"/";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
 
         AssertMatchPath(ret.Result, "/", "", null);
         AssertNonMatchPath(ret.Result, "aaa");
@@ -33,6 +47,8 @@ public class PathParserTest
         var src = @"/path1/path2";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
 
         AssertMatchPath(ret.Result, "/path1/path2", "", null);
         AssertNonMatchPath(ret.Result, "/path1");
@@ -47,6 +63,8 @@ public class PathParserTest
         var src = @"/path1/path2/";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
 
         AssertMatchPath(ret.Result, "/path1/path2/", "", null);
         AssertNonMatchPath(ret.Result, "/path1");
@@ -88,6 +106,8 @@ public class PathParserTest
         var src = @"/path1/{anything: /.*/}";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
 
         AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
         {
@@ -110,6 +130,8 @@ public class PathParserTest
         var src = @"/path1/{anything: /.*/}/path2/path3";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
 
         AssertNonMatchPath(ret.Result, "/path1/aaa/path2/path3");
         AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/path2/path3/");
@@ -117,14 +139,104 @@ public class PathParserTest
         AssertNonMatchPath(ret.Result, "/path1/aaa/path2/path");
     }
 
-    private void AssertMatchPath(Matcher matcher, string path, string expectedRemainder, Dictionary<string, string>? expectedBindings)
+    [Test]
+    public void TestSplayAnything()
+    {
+        var src = @"/path1/{anything: splat}";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertMatchPath(ret.Result, "/path1/", "", new Dictionary<string, string>
+        {
+            {"anything", ""},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb/", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb/"},
+        });
+    }
+
+    [Test]
+    public void TestSplayAnythingWithEnding()
+    {
+        // Splat is greedy by design, so this path would never match
+        var src = @"/path1/{anything: splat}/aaa/bbb";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+        AssertNonMatchPath(ret.Result, "/path1/path2/aaa/bbb");
+    }
+
+    [Test]
+    public void TestSplitCount()
+    {
+        var src = @"/path1/{anything: splat(2)}";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa");
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/ccc");
+    }
+
+    [Test]
+    public void TestSplitCountWithEnding()
+    {
+        var src = @"/path1/{anything: splat(2)}/aaa/bbb";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/aaa");
+        AssertMatchPath(ret.Result, "/path1/aaa/aaa/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/ccc");
+    }
+
+    private static void AssertMatchPath(Matcher matcher, string path, string expectedRemainder, Dictionary<string, string>? expectedBindings)
     {
         var match = matcher.Match(path, out var remainder, out var bindings);
 
         // test if match
-        if (match == false)
+        if (!match)
         {
-            Assert.Fail("route match");
+            Assert.Fail("route does not match");
             return;
         }
 
@@ -138,23 +250,19 @@ public class PathParserTest
 
         if (!expectedBindings.Equal(bindings))
         {
-            Console.WriteLine($"Expected bindings: {expectedBindings}");
-            Console.WriteLine($"Actual bindings: {bindings}");
+            Console.WriteLine($"Expected bindings: {expectedBindings.String()}");
+            Console.WriteLine($"Actual bindings: {bindings.String()}");
             Assert.Fail("bindings mismatch");
         }
 
         return;
     }
 
-    private void AssertNonMatchPath(Matcher matcher, string path)
+    private static void AssertNonMatchPath(Matcher matcher, string path)
     {
         var match = matcher.Match(path, out var remainder, out var bindings);
 
-        // test if match
-        if (match == true)
-        {
-            Assert.Fail("route match");
-            return;
-        }
+        if (!match) return;
+        Assert.Fail("route match");
     }
 }

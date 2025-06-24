@@ -31,9 +31,9 @@ namespace ServeSharp.NetHttp
                     return;
                 }
 
-                var conn = await socket.AcceptAsync();
+                var conn = await socket.AcceptAsync().ConfigureAwait(false);
                 var buffer = new byte[1024];
-                var received = await conn.ReceiveAsync(buffer, SocketFlags.None);
+                var received = await conn.ReceiveAsync(buffer, SocketFlags.None).ConfigureAwait(false);
                 var s = Encoding.UTF8.GetString(buffer, 0, received);
                 Console.WriteLine(s);
 
@@ -60,7 +60,7 @@ namespace ServeSharp.NetHttp
                 context.Http.Response = new HttpResponseMessage();
                 await Router.Handle(context);
 
-                await conn.SendAsync(await context.Http.Response.ToByteArray(), SocketFlags.None);
+                await conn.SendAsync(await context.Http.Response.ToByteArray().ConfigureAwait(false), SocketFlags.None).ConfigureAwait(false);
                 conn.Close();
             }
         }

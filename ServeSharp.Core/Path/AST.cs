@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,15 +19,10 @@ namespace ServeSharp.Core.Path
     {
         private readonly List<Matcher> _matchers = new List<Matcher>();
 
-        public RootMatcher()
-        {
-        }
+        public RootMatcher() { }
 
-        public RootMatcher(params Matcher[] matchers)
-        {
-            _matchers.AddRange(matchers);
-        }
-
+        public RootMatcher(params Matcher[] matchers) => _matchers.AddRange(matchers);
+        
         public void Add(Matcher matcher) => _matchers.Add(matcher);
 
         public override string ToString()
@@ -37,7 +31,7 @@ namespace ServeSharp.Core.Path
             sb.AppendLine("[AST]");
             foreach (var matcher in _matchers)
             {
-                sb.AppendLine($"  {matcher}");
+                sb.AppendLine($"  /{matcher}");
             }
 
             sb.AppendLine("");
@@ -119,6 +113,9 @@ namespace ServeSharp.Core.Path
         }
     }
 
+    /// <summary>
+    /// <c>StaticMatcher</c> matches any literal.
+    /// </summary>
     public class StaticMatcher : Matcher
     {
         private readonly string _value;
@@ -143,45 +140,73 @@ namespace ServeSharp.Core.Path
         }
     }
 
-    public class BindingMatcher : Matcher
+    /// <summary>
+    /// <c>BindingSplatMatcher</c> matches N segments separated by '/'. N=0 is a special case for matching anything (0 or more characters).
+    /// </summary>
+    public class BindingSplatMatcher : Matcher
     {
         private readonly string _bindingDestination;
-        private readonly Regex? _regex;
+        private readonly int _n;
 
-        public BindingMatcher(string dst, string? regex = null)
+        public BindingSplatMatcher(string dst, int n = 0)
         {
             _bindingDestination = dst;
-            if (regex != null)
-            {
-                _regex = new Regex(regex, RegexOptions.Compiled | RegexOptions.Singleline);
-            }
+            _n = n;
         }
 
-        public override string ToString() => $"[{_bindingDestination} -> {_regex?.ToString() ?? "*any*"}]";
+        public override string ToString() => $"[{_bindingDestination} -> splat({(_n == 0 ? "anything" : _n.ToString())})]";
 
         public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
         {
-            // regex unset; match ends before the first "/"
-            if (_regex == null)
+            // special case: if _n == 0 then match anything (0 or more characters)
+            if (_n == 0)
             {
-                var cutPtr = path.IndexOf('/', StringComparison.Ordinal);
-                if (cutPtr == -1)
-                {
-                    remainder = "";
-                }
-                else
-                {
-                    remainder = path[cutPtr..];
-                    path = path.Remove(cutPtr);
-                }
-
                 binding = new Dictionary<string, string>
                 {
                     [_bindingDestination] = path,
                 };
+                remainder = "";
                 return true;
             }
 
+            // match N segments
+            var c = path.Split('/', _n + 1);
+
+            // not getting N segments, return non-match
+            if (c.Length < _n)
+            {
+                remainder = path;
+                binding = null;
+                return false;
+            }
+
+            remainder = c.Length == _n ? "" : "/" + c[_n];
+            binding = new Dictionary<string, string>
+            {
+                [_bindingDestination] = c[.._n].Join("/"),
+            };
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// <c>BindingRegexMatcher</c> matches anything that matches the regular expression. It does not stop at '/'.
+    /// </summary>
+    public class BindingRegexMatcher : Matcher
+    {
+        private readonly string _bindingDestination;
+        private readonly Regex _regex;
+
+        public BindingRegexMatcher(string dst, string regex)
+        {
+            _bindingDestination = dst;
+            _regex = new Regex(regex, RegexOptions.Compiled | RegexOptions.Singleline);
+        }
+
+        public override string ToString() => $"[{_bindingDestination} -> {_regex.ToString() ?? "*any*"}]";
+
+        public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
+        {
             // regex set: match the first regex
             var m = _regex.Match(path);
             if (!m.Success)

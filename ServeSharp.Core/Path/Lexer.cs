@@ -32,5 +32,21 @@ namespace ServeSharp.Core.Path
         [String("/", "\\")]
         [Mode("bind")]
         BIND_REGEXP,
+
+        [Keyword("splat")]
+        [Mode("bind")]
+        BIND_SPLAT,
+
+        [Sugar("(")]
+        [Mode("bind")]
+        LBRACKET,
+
+        [Int]
+        [Mode("bind")]
+        BIND_SPLAT_COUNT,
+
+        [Sugar(")")]
+        [Mode("bind")]
+        RBRACKET,
     }
 }

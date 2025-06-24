@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Castle.Components.DictionaryAdapter;
 
 namespace ServeSharp.Core.Path
@@ -36,6 +37,25 @@ namespace ServeSharp.Core.Path
             }
 
             return current.OrderBy(x => x.Key).SequenceEqual(other.OrderBy(x => x.Key));
+        }
+
+        public static string String<TKey, TValue>(this Dictionary<TKey, TValue>? current)
+        {
+            if (current == null)
+            {
+                return "[null]";
+            }
+
+            var sb = new StringBuilder();
+            sb.Append($"[{current.GetType()}]");
+            sb.AppendLine(" {");
+            foreach (var kv in current)
+            {
+                sb.AppendLine($"  \"{kv.Key}\": \"{kv.Value}\"");
+            }
+
+            sb.Append('}');
+            return sb.ToString();
         }
     }
 }
