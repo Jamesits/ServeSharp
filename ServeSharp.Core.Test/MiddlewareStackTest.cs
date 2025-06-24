@@ -91,6 +91,69 @@ public class MiddlewareStackTest
             [101, 601, 201, 501, 301, 509, 608, 609, 109]);
     }
 
+    [Test]
+    public async Task TestRecoveryTerminatingMiddlewareStack()
+    {
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+            PlainChainedMiddleware1,
+            RecoveryMiddleware,
+            PlainChainedMiddleware2,
+            ExceptionTerminatingMiddleware
+        ),
+        [101, 601, 201, 801, 608, 609, 109]);
+    }
+
+    [Test]
+    public Task TestFinalizingBeforeMiddlewareTask()
+    {
+        Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                    PlainChainedMiddleware1,
+                    FinalizerMiddleware,
+                    PlainChainedMiddleware2,
+                    ExceptionBeforeMiddleware,
+                    PlainTerminatingMiddleware
+                ),
+                [101, 701, 201, 401, 709]);
+        });
+        return Task.CompletedTask;
+    }
+
+    [Test]
+    public Task TestFinalizingAfterMiddlewareStack()
+    {
+        Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                    PlainChainedMiddleware1,
+                    FinalizerMiddleware,
+                    PlainChainedMiddleware2,
+                    ExceptionAfterMiddleware,
+                    PlainTerminatingMiddleware
+                ),
+                [101, 701, 201, 501, 301, 509, 709]);
+        });
+        return Task.CompletedTask;
+    }
+
+    [Test]
+    public Task TestFinalizingTerminatingMiddlewareStack()
+    {
+        Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                FinalizerMiddleware,
+                PlainChainedMiddleware2,
+                ExceptionTerminatingMiddleware
+            ),
+            [101, 701, 201, 801, 709]);
+
+        });
+        return Task.CompletedTask;
+    }
+
     private async Middleware.Middleware Execute(MiddlewareStack<ConcurrentQueue<int>> stack,
         int[] expectedSeq)
     {
@@ -161,5 +224,24 @@ public class MiddlewareStackTest
         {
             context.Enqueue(609);
         }
+    }
+
+    private static async Middleware.Middleware FinalizerMiddleware(ConcurrentQueue<int> context, IAwaitable next)
+    {
+        try
+        {
+            context.Enqueue(701);
+            await next;
+            context.Enqueue(708);
+        }
+        finally
+        {
+            context.Enqueue(709);
+        }
+    }
+    private static async Middleware.Middleware ExceptionTerminatingMiddleware(ConcurrentQueue<int> context, IAwaitable next)
+    {
+        context.Enqueue(801);
+        throw new InvalidOperationException();
     }
 }
