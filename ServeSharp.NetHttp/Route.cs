@@ -10,17 +10,28 @@ namespace ServeSharp.NetHttp
     {
         public string Name { get; set; } = "UNNAMED";
         public string OriginalRouteDefinition { get; internal set; } = "";
-        public Matcher Matcher { get; internal set; }
-        public HttpMethod? Method { get; internal set; }
-        public HandleFunc<Context>[] Middlewares { get; internal set; }
+        public Matcher Matcher { get; }
+        public HttpMethod? Method { get; }
+        private HandleFunc<Context>[] _handlers;
 
-        public override string ToString() => $"{Name} {Method?.ToString() ?? "ANY"} Handler({Middlewares.Length}) {OriginalRouteDefinition}";
+        public Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers)
+        {
+            Method = method;
+            Matcher = matcher;
+            _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
+        }
+
+        public override string ToString() => $"{Name} {Method?.ToString() ?? "ANY"} Handler[{_handlers.Length}] {OriginalRouteDefinition}";
 
         public bool Match(Context context)
         {
-            if (context?.Http?.Request == null)
+            if (context == null)
             {
-                throw new InvalidOperationException("Request is null");
+                throw new ArgumentNullException(nameof(context));
+            }
+            if (context.Http.Request == null)
+            {
+                throw new ArgumentNullException(nameof(context), "context.Http.Request is null");
             }
 
             // method == null: match any
@@ -35,5 +46,7 @@ namespace ServeSharp.NetHttp
             context.Http.UrlBindings = bindings;
             return ret;
         }
+
+        public MiddlewareStack<Context> Stack => new MiddlewareStack<Context>(_handlers);
     }
 }

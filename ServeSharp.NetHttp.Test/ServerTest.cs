@@ -11,7 +11,9 @@ public class ServerTest
     [SetUp]
     public void Setup()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         _server = new Server();
+#pragma warning restore CS0618 // Type or member is obsolete
         _server.Router.Get("/", async (context, _) =>
         {
             Debug.Assert(context.Http.Response != null, "context.Http.Response != null");

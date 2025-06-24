@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using ServeSharp.Core.Path;
+﻿using ServeSharp.Core.Path;
 using sly.parser;
 
 namespace ServeSharp.Core.Test;

@@ -23,9 +23,9 @@ namespace ServeSharp.NetHttp
 
         public bool AutoHead { get; set; }
 
-        public void Use(params HandleFunc<Context>[] middlewares)
+        public void Use(params HandleFunc<Context>[] handlers)
         {
-            _middlewares.AddRange(middlewares);
+            _middlewares.AddRange(handlers);
         }
 
         public IPathGroup<Context, Route> Group(string path) => new RouteGroup(_parent, _path + path);

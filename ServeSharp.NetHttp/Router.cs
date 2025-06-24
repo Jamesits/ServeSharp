@@ -17,9 +17,9 @@ namespace ServeSharp.NetHttp
         private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
 
         public bool AutoHead { get; set; } = true;
-        public HandleFunc<Context> NotFound { internal get; set; } = DefaultNotFoundHandler;
+        public HandleFunc<Context> NotFound { private get; set; } = DefaultNotFoundHandler;
 
-        public void Use(params HandleFunc<Context>[] middleware) => _middlewares.AddRange(middleware);
+        public void Use(params HandleFunc<Context>[] handlers) => _middlewares.AddRange(handlers);
 
         public IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
 
@@ -34,12 +34,9 @@ namespace ServeSharp.NetHttp
             var pr = _parser.Parse(path);
             pr.ThrowIfError();
 
-            var ret = new Route()
+            var ret = new Route(method, pr.Result, _middlewares.Concat(handlers).ToArray())
             {
                 OriginalRouteDefinition = path,
-                Method = method,
-                Matcher = pr.Result,
-                Middlewares = _middlewares.Concat(handlers).ToArray(),
             };
 
             return Route(ret);
@@ -47,14 +44,19 @@ namespace ServeSharp.NetHttp
 
         public async Middleware Handle(Context context)
         {
-#pragma warning disable CA2007
-            // StackingAwaiter must be created here so that task continuations are flattened to this level.
-            await using var next = new StackingAwaiter();
-#pragma warning restore CA2007
+            var stack = _routes.FirstOrDefault(route => route.Match(context))?.Stack ?? NotFoundStack;
 
-            var route = _routes.FirstOrDefault(route => route.Match(context));
-            var stack = route == null ? new MiddlewareStack<Context>(_middlewares.Append(NotFound).ToArray()) : new MiddlewareStack<Context>(route.Middlewares);
-            await stack.Handle(context, next);
+            // StackingAwaiter must be created here so that task continuations are flattened to this level.
+            var next = new StackingAwaiter();
+            try
+            {
+                await stack.Handle(context, next);
+            }
+            finally
+            {
+                // https://stackoverflow.com/a/70887681
+                await next.DisposeAsync().ConfigureAwait(false);
+            }
         }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -63,6 +65,8 @@ namespace ServeSharp.NetHttp
         {
             Console.WriteLine("404 NOT FOUND");
         }
+
+        private MiddlewareStack<Context> NotFoundStack => new MiddlewareStack<Context>(_middlewares.Append(NotFound).ToArray());
 
         public override string ToString()
         {
