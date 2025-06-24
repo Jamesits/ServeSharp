@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 namespace ServeSharp.NetHttp
 {
     [Obsolete("For testing only, do not use in production")]
-    public class Server
+    public class Server : IDisposable
     {
-        private CancellationTokenSource _cts = new CancellationTokenSource();
-        private Socket socket;
+        private bool _disposed;
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private Socket _socket;
 
         public Router Router { get; } = new Router();
 
@@ -63,6 +64,24 @@ namespace ServeSharp.NetHttp
                 await conn.SendAsync(await context.Http.Response.ToByteArray(), SocketFlags.None);
                 conn.Close();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _cts.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

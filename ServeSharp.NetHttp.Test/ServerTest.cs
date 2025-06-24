@@ -18,6 +18,12 @@ public class ServerTest
         });
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        _server.Dispose();
+    }
+
     [Test]
     public async Task Test1()
     {

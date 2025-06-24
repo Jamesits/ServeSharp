@@ -17,14 +17,15 @@ namespace ServeSharp.Core.Middleware
         // Keeps track of any deferred code blocks
         private readonly ConcurrentStack<Action> _completions = new ConcurrentStack<Action>();
         // Queued exception to be raised on `await`
-        private Exception? _exception;
+        private AggregateException? _exception;
 
         // Queue an exception to be raised at next await
         public void QueueException(Exception? exception)
         {
             lock (this)
             {
-                _exception = exception;
+                // Always save the original exception inside one AggregateException, since stack information is wiped if the exception is re-thrown.
+                _exception = _exception.Append(exception);
             }
         }
 

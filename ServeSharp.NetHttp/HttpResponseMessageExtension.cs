@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,8 @@ namespace ServeSharp.NetHttp
     {
         public static async Task<byte[]> ToByteArray(this HttpResponseMessage response)
         {
+            if (response == null) throw new InvalidOperationException("null response");
+
             using var m = new MemoryStream();
             await using var writer = new BinaryWriter(m, Encoding.UTF8);
             writer.WriteString($"HTTP/1.1 {(int)response.StatusCode} {response.ReasonPhrase}\r\n");
@@ -44,7 +47,7 @@ namespace ServeSharp.NetHttp
                 writer.WriteString("\r\n\r\n");
             }
             writer.Flush();
-            await m.FlushAsync();
+            await m.FlushAsync().ConfigureAwait(false);
 
             return m.ToArray();
         }
