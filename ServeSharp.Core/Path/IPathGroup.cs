@@ -1,24 +1,15 @@
-﻿using System.Net.Http;
+﻿#nullable enable
+using System.Net.Http;
 using ServeSharp.Core.Middleware;
 
 namespace ServeSharp.Core.Path
 {
     public interface IPathGroup<out TContext, out TRoute>
     {
-        // currently not inheritable
-        // public bool AutoHead { get; set; }
-        // public HandleFunc<TContext> NotFound { set; }
-        // public void Use(params HandleFunc<TContext>[] middleware);
+        public bool AutoHead { get; set; }
+        public void Use(params HandleFunc<TContext>[] handlers);
         public IPathGroup<TContext, TRoute> Group(string path);
 
-        public TRoute Route(HttpMethod method, string path, HandleFunc<TContext> handler);
-        public TRoute Get(string path, HandleFunc<TContext> handler);
-        public TRoute Patch(string path, HandleFunc<TContext> handler);
-        public TRoute Post(string path, HandleFunc<TContext> handler);
-        public TRoute Put(string path, HandleFunc<TContext> handler);
-        public TRoute Delete(string path, HandleFunc<TContext> handler);
-        public TRoute Options(string path, HandleFunc<TContext> handler);
-        public TRoute Head(string path, HandleFunc<TContext> handler);
-        public TRoute Trace(string path, HandleFunc<TContext> handler);
+        public TRoute Route(HttpMethod? method, string path, params HandleFunc<TContext> []handlers);
     }
 }

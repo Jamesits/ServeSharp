@@ -218,6 +218,7 @@ public class MiddlewareStackTest
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Caught exception in Recovery middleware: {ex}");
             context.Enqueue(608);
         }
         finally
@@ -244,4 +245,4 @@ public class MiddlewareStackTest
         context.Enqueue(801);
         throw new InvalidOperationException();
     }
-}
+} 

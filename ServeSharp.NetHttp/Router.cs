@@ -21,11 +21,7 @@ namespace ServeSharp.NetHttp
 
         public void Use(params HandleFunc<Context>[] middleware) => _middlewares.AddRange(middleware);
 
-        public IPathGroup<Context, Route> Group(string path) => new RouteGroup()
-        {
-            _parent = this,
-            _path = path,
-        };
+        public IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
 
         internal Route Route(Route route)
         {
@@ -33,7 +29,7 @@ namespace ServeSharp.NetHttp
             return route;
         }
 
-        public Route Route(HttpMethod method, string path, HandleFunc<Context> handler)
+        public Route Route(HttpMethod? method, string path, params HandleFunc<Context> []handlers)
         {
             var pr = _parser.Parse(path);
             pr.ThrowIfError();
@@ -43,24 +39,11 @@ namespace ServeSharp.NetHttp
                 OriginalRouteDefinition = path,
                 Method = method,
                 Matcher = pr.Result,
-                Handler = handler,
+                Middlewares = _middlewares.Concat(handlers).ToArray(),
             };
 
             return Route(ret);
         }
-
-        public Route Get(string path, HandleFunc<Context> handler)
-        {
-            if (AutoHead) Route(HttpMethod.Head, path, handler);
-            return Route(HttpMethod.Get, path, handler);
-        }
-        public Route Patch(string path, HandleFunc<Context> handler) => Route(HttpMethod.Patch, path, handler);
-        public Route Post(string path, HandleFunc<Context> handler) => Route(HttpMethod.Post, path, handler);
-        public Route Put(string path, HandleFunc<Context> handler) => Route(HttpMethod.Put, path, handler);
-        public Route Delete(string path, HandleFunc<Context> handler) => Route(HttpMethod.Delete, path, handler);
-        public Route Options(string path, HandleFunc<Context> handler) => Route(HttpMethod.Options, path, handler);
-        public Route Head(string path, HandleFunc<Context> handler) => Route(HttpMethod.Head, path, handler);
-        public Route Trace(string path, HandleFunc<Context> handler) => Route(HttpMethod.Trace, path, handler);
 
         public async Middleware Handle(Context context)
         {
@@ -68,11 +51,9 @@ namespace ServeSharp.NetHttp
             // StackingAwaiter must be created here so that task continuations are flattened to this level.
             await using var next = new StackingAwaiter();
 #pragma warning restore CA2007
-            
-            var handleFunc = _routes.Where(route => route.Match(context)).Select<Route, HandleFunc<Context>>(route => route.Handler).FirstOrDefault() ?? NotFound;
-            var stack = new MiddlewareStack<Context>(_middlewares.ToArray());
-            stack.Add(handleFunc);
 
+            var route = _routes.FirstOrDefault(route => route.Match(context));
+            var stack = route == null ? new MiddlewareStack<Context>(_middlewares.Append(NotFound).ToArray()) : new MiddlewareStack<Context>(route.Middlewares);
             await stack.Handle(context, next);
         }
 

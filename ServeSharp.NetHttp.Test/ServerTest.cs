@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;
 
