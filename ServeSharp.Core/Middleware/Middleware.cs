@@ -20,14 +20,19 @@ namespace ServeSharp.Core.Middleware
         // Contains the exception from the "before" hook; required for Awaiter to bubble up the exception to the caller
         private Exception? _exception;
 
+        internal Middleware() {}
+
         internal Middleware(CancellationToken ctTopHalf, CancellationToken ctLowerHalf)
         {
             _ctTopHalf = ctTopHalf;
             _ctLowerHalf = ctLowerHalf;
         }
 
+        // Useful if you have one sync Middleware function and want to get rid of the compiler warnings.
+        public static Middleware CompletedTask => new Middleware{IsCompleted = true};
+
         // IsCompleted should always return false, so that the parent AsyncMethodBuilder calls our OnCompleted method.
-        public bool IsCompleted => false;
+        public bool IsCompleted { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IAwaiter GetAwaiter() => this;
@@ -40,6 +45,11 @@ namespace ServeSharp.Core.Middleware
                 if (_exception != null)
                 {
                     throw _exception;
+                }
+
+                if (IsCompleted)
+                {
+                    return;
                 }
             }
             _ctTopHalf.WaitHandle.WaitOne();

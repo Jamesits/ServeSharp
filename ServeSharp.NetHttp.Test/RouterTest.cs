@@ -29,12 +29,21 @@ public class RouterTest
             Console.WriteLine("Middleware 2 exit");
         });
 
-        _router.Get("/root", async (context, _) => Console.WriteLine("Get root"));
-        _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", async (context, _) =>
+        _router.Get("/root", (context, _) =>
+        {
+            Console.WriteLine("Get root");
+            return Middleware.CompletedTask;
+        });
+        _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", (context, _) =>
         {
             Console.WriteLine("Post complex route");
+            return Middleware.CompletedTask;
         });
-        _router.Group("/group1").Any("/any", async (context, _) => Console.WriteLine("Any"));
+        _router.Group("/group1").Any("/any", (context, _) =>
+        {
+            Console.WriteLine("Any"); 
+            return Middleware.CompletedTask;
+        });
 
         Console.WriteLine(_router);
     }

@@ -16,7 +16,14 @@ public class MiddlewareStackTest
         await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
                 PlainChainedMiddleware1,
                 PlainChainedMiddleware2,
-                PlainTerminatingMiddleware
+                PlainTerminatingMiddlewareAsync
+            ),
+            [101, 201, 301, 209, 109]);
+
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainChainedMiddleware2,
+                PlainTerminatingMiddlewareSync
             ),
             [101, 201, 301, 209, 109]);
     }
@@ -30,7 +37,18 @@ public class MiddlewareStackTest
                     PlainChainedMiddleware1,
                     ExceptionBeforeMiddleware,
                     PlainChainedMiddleware2,
-                    PlainTerminatingMiddleware
+                    PlainTerminatingMiddlewareAsync
+                ),
+                [101, 401]);
+        });
+
+        Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                    PlainChainedMiddleware1,
+                    ExceptionBeforeMiddleware,
+                    PlainChainedMiddleware2,
+                    PlainTerminatingMiddlewareSync
                 ),
                 [101, 401]);
         });
@@ -46,7 +64,18 @@ public class MiddlewareStackTest
                     PlainChainedMiddleware1,
                     ExceptionAfterMiddleware,
                     PlainChainedMiddleware2,
-                    PlainTerminatingMiddleware
+                    PlainTerminatingMiddlewareAsync
+                ),
+                [101, 501, 201, 301, 209, 509]);
+        });
+
+        Assert.ThrowsAsync<AggregateException>(async () =>
+        {
+            await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                    PlainChainedMiddleware1,
+                    ExceptionAfterMiddleware,
+                    PlainChainedMiddleware2,
+                    PlainTerminatingMiddlewareSync
                 ),
                 [101, 501, 201, 301, 209, 509]);
         });
@@ -60,7 +89,15 @@ public class MiddlewareStackTest
                 PlainChainedMiddleware1,
                 RecoveryMiddleware,
                 PlainChainedMiddleware2,
-                PlainTerminatingMiddleware
+                PlainTerminatingMiddlewareAsync
+            ),
+            [101, 601, 201, 301, 209, 607, 609, 109]);
+
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                RecoveryMiddleware,
+                PlainChainedMiddleware2,
+                PlainTerminatingMiddlewareSync
             ),
             [101, 601, 201, 301, 209, 607, 609, 109]);
     }
@@ -73,9 +110,17 @@ public class MiddlewareStackTest
                     RecoveryMiddleware,
                     PlainChainedMiddleware2,
                     ExceptionBeforeMiddleware,
-                    PlainTerminatingMiddleware
+                    PlainTerminatingMiddlewareAsync
                 ),
                 [101, 601, 201, 401, 608, 609, 109]);
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                RecoveryMiddleware,
+                PlainChainedMiddleware2,
+                ExceptionBeforeMiddleware,
+                PlainTerminatingMiddlewareSync
+            ),
+            [101, 601, 201, 401, 608, 609, 109]);
     }
 
     [Test]
@@ -86,7 +131,15 @@ public class MiddlewareStackTest
                 RecoveryMiddleware,
                 PlainChainedMiddleware2,
                 ExceptionAfterMiddleware,
-                PlainTerminatingMiddleware
+                PlainTerminatingMiddlewareAsync
+            ),
+            [101, 601, 201, 501, 301, 509, 608, 609, 109]);
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                RecoveryMiddleware,
+                PlainChainedMiddleware2,
+                ExceptionAfterMiddleware,
+                PlainTerminatingMiddlewareSync
             ),
             [101, 601, 201, 501, 301, 509, 608, 609, 109]);
     }
@@ -113,7 +166,7 @@ public class MiddlewareStackTest
                     FinalizerMiddleware,
                     PlainChainedMiddleware2,
                     ExceptionBeforeMiddleware,
-                    PlainTerminatingMiddleware
+                    PlainTerminatingMiddlewareAsync
                 ),
                 [101, 701, 201, 401, 709]);
         });
@@ -130,7 +183,7 @@ public class MiddlewareStackTest
                     FinalizerMiddleware,
                     PlainChainedMiddleware2,
                     ExceptionAfterMiddleware,
-                    PlainTerminatingMiddleware
+                    PlainTerminatingMiddlewareAsync
                 ),
                 [101, 701, 201, 501, 301, 509, 709]);
         });
@@ -189,9 +242,15 @@ public class MiddlewareStackTest
         context.Enqueue(209);
     }
 
-    private static async Middleware.Middleware PlainTerminatingMiddleware(ConcurrentQueue<int> context, IAwaitable next)
+    private static async Middleware.Middleware PlainTerminatingMiddlewareAsync(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(301);
+    }
+
+    private static Middleware.Middleware PlainTerminatingMiddlewareSync(ConcurrentQueue<int> context, IAwaitable next)
+    {
+        context.Enqueue(301);
+        return Middleware.Middleware.CompletedTask;
     }
 
     private static async Middleware.Middleware ExceptionBeforeMiddleware(ConcurrentQueue<int> context, IAwaitable next)
@@ -245,4 +304,4 @@ public class MiddlewareStackTest
         context.Enqueue(801);
         throw new InvalidOperationException();
     }
-} 
+}
