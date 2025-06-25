@@ -26,7 +26,7 @@ namespace ServeSharp.Core.Context
         {
             return _factory.GetAdapter<T>(_dict);
         }
-            
+
         public void Dispose()
         {
             Dispose(true);

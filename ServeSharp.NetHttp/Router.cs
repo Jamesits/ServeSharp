@@ -29,7 +29,7 @@ namespace ServeSharp.NetHttp
             return route;
         }
 
-        public Route Route(HttpMethod? method, string path, params HandleFunc<Context> []handlers)
+        public Route Route(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
         {
             var pr = _parser.Parse(path);
             pr.ThrowIfError();
@@ -59,11 +59,10 @@ namespace ServeSharp.NetHttp
             }
         }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        private static async Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        private static Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
         {
             Console.WriteLine("404 NOT FOUND");
+            return Middleware.CompletedTask;
         }
 
         private MiddlewareStack<Context> NotFoundStack => new MiddlewareStack<Context>(_middlewares.Append(NotFound).ToArray());

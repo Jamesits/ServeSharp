@@ -6,9 +6,7 @@ namespace ServeSharp.Core.Test;
 public class MiddlewareStackTest
 {
     [SetUp]
-    public void Setup()
-    {
-    }
+    public void Setup() { }
 
     [Test]
     public async Task TestPlainMiddlewareStack()
@@ -28,6 +26,7 @@ public class MiddlewareStackTest
             [101, 201, 301, 209, 109]);
     }
 
+    // If exception is thrown before `await next` call, further middleware call would be stopped immediately; exception should pop up to every executed middleware's bottom part.
     [Test]
     public Task TestThrowingBeforeMiddlewareStack()
     {
@@ -55,6 +54,7 @@ public class MiddlewareStackTest
         return Task.CompletedTask;
     }
 
+    // If exception is thrown after `await next` call, exception should pop up to every executed middleware's bottom part.
     [Test]
     public Task TestThrowingAfterMiddlewareStack()
     {
@@ -82,6 +82,7 @@ public class MiddlewareStackTest
         return Task.CompletedTask;
     }
 
+    // Recovery middleware should not disrupt a normal execution flow.
     [Test]
     public async Task TestRecoveryNothingMiddlewareStack()
     {
@@ -151,13 +152,14 @@ public class MiddlewareStackTest
             PlainChainedMiddleware1,
             RecoveryMiddleware,
             PlainChainedMiddleware2,
-            ExceptionTerminatingMiddleware
+            ExceptionBeforeMiddleware
         ),
-        [101, 601, 201, 801, 608, 609, 109]);
+        [101, 601, 201, 401, 608, 609, 109]);
     }
 
+    // When exception is thrown, `try` should be cancelled, then `finally` should run, then control flow returns to the upper middleware; exception should be rethrown.
     [Test]
-    public Task TestFinalizingBeforeMiddlewareTask()
+    public Task TestFinalizingTask()
     {
         Assert.ThrowsAsync<AggregateException>(async () =>
         {
@@ -170,12 +172,7 @@ public class MiddlewareStackTest
                 ),
                 [101, 701, 201, 401, 709]);
         });
-        return Task.CompletedTask;
-    }
 
-    [Test]
-    public Task TestFinalizingAfterMiddlewareStack()
-    {
         Assert.ThrowsAsync<AggregateException>(async () =>
         {
             await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
@@ -187,24 +184,51 @@ public class MiddlewareStackTest
                 ),
                 [101, 701, 201, 501, 301, 509, 709]);
         });
-        return Task.CompletedTask;
-    }
 
-    [Test]
-    public Task TestFinalizingTerminatingMiddlewareStack()
-    {
         Assert.ThrowsAsync<AggregateException>(async () =>
         {
             await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
-                PlainChainedMiddleware1,
-                FinalizerMiddleware,
-                PlainChainedMiddleware2,
-                ExceptionTerminatingMiddleware
-            ),
-            [101, 701, 201, 801, 709]);
+                    PlainChainedMiddleware1,
+                    FinalizerMiddleware,
+                    PlainChainedMiddleware2,
+                    ExceptionBeforeMiddleware
+                ),
+                [101, 701, 201, 401, 709]);
 
         });
+
         return Task.CompletedTask;
+    }
+
+    // If no more middleware is found, `await next` should have no effect
+    [Test]
+    public async Task TestStackOverrunOnTermination1MiddlewareStack()
+    {
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainChainedMiddleware2
+            ),
+            [101, 201, 209, 109]);
+    }
+
+    // Excessive `await next` calls in the same middleware should have no effect
+    [Test]
+    public async Task TestStackOverrun2MiddlewareStack()
+    {
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainChainedMiddleware2,
+                NextMiddleware2
+            ),
+            [101, 201, 1001, 1002, 1003, 209, 109]);
+
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainChainedMiddleware2,
+                NextMiddleware2,
+                PlainTerminatingMiddlewareSync
+            ),
+            [101, 201, 1001, 301, 1002, 1003, 209, 109]);
     }
 
     private async Middleware.Middleware Execute(MiddlewareStack<ConcurrentQueue<int>> stack,
@@ -228,6 +252,7 @@ public class MiddlewareStackTest
         }
     }
 
+    // Plain middleware which chains to the next middleware
     private static async Middleware.Middleware PlainChainedMiddleware1(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(101);
@@ -235,6 +260,7 @@ public class MiddlewareStackTest
         context.Enqueue(109);
     }
 
+    // Plain middleware which chains to the next middleware (duplicated for some test fixtures)
     private static async Middleware.Middleware PlainChainedMiddleware2(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(201);
@@ -243,12 +269,14 @@ public class MiddlewareStackTest
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    // Plain middleware that returns (does not call the next middleware)
     private static async Middleware.Middleware PlainTerminatingMiddlewareAsync(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(301);
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+    // Plain middleware that returns (does not call the next middleware), using Middleware.CompletedTask
     private static Middleware.Middleware PlainTerminatingMiddlewareSync(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(301);
@@ -256,6 +284,7 @@ public class MiddlewareStackTest
     }
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+    // Middleware that throws before calling the next middleware
     private static async Middleware.Middleware ExceptionBeforeMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(401);
@@ -263,6 +292,7 @@ public class MiddlewareStackTest
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
+    // Middleware that throws after calling the next middleware
     private static async Middleware.Middleware ExceptionAfterMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         context.Enqueue(501);
@@ -271,6 +301,7 @@ public class MiddlewareStackTest
         throw new InvalidOperationException();
     }
 
+    // Middleware that catches all exceptions from every middleware below
     private static async Middleware.Middleware RecoveryMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         try
@@ -290,6 +321,7 @@ public class MiddlewareStackTest
         }
     }
 
+    // Middleware that has a try/finally stanza
     private static async Middleware.Middleware FinalizerMiddleware(ConcurrentQueue<int> context, IAwaitable next)
     {
         try
@@ -304,12 +336,13 @@ public class MiddlewareStackTest
         }
     }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    private static async Middleware.Middleware ExceptionTerminatingMiddleware(ConcurrentQueue<int> context, IAwaitable next)
+    // Middleware that call `await next` twice
+    private static async Middleware.Middleware NextMiddleware2(ConcurrentQueue<int> context, IAwaitable next)
     {
-        context.Enqueue(801);
-        throw new InvalidOperationException();
+        context.Enqueue(1001);
+        await next;
+        context.Enqueue(1002);
+        await next;
+        context.Enqueue(1003);
     }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-
 }

@@ -55,7 +55,7 @@ namespace ServeSharp.Core.Path
         }
 
         [Production("segment : [ literal | binding_segment | binding_splat_any | binding_splat | binding_regex ]*")]
-        public Matcher Segment(List<Matcher> m) =>  m.Count == 1 ? m[0] : new AggregatedMatcher(m.ToArray());
+        public Matcher Segment(List<Matcher> m) => m.Count == 1 ? m[0] : new AggregatedMatcher(m.ToArray());
 
         // ReSharper disable once StringLiteralTypo
         // Matches string literal

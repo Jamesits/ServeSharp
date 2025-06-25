@@ -76,7 +76,7 @@ namespace ServeSharp.Core.Middleware
             GetResult();
         }
         #region impl of ICriticalNotifyCompletion
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void OnCompleted(Action completion) => Defer(completion);
 

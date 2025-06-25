@@ -31,7 +31,7 @@ public static class CustomContextMiddleware
 
 public class MiddlewareTest
 {
-    private Router _router;
+    private Router? _router;
     [SetUp]
     public void Setup()
     {

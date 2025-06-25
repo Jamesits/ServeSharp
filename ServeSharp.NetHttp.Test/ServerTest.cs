@@ -6,9 +6,11 @@ namespace ServeSharp.NetHttp.Test;
 
 public class ServerTest
 {
-    private Server _server;
+    [Obsolete]
+    private Server? _server;
 
     [SetUp]
+    [Obsolete]
     public void Setup()
     {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -27,6 +29,7 @@ public class ServerTest
     }
 
     [TearDown]
+    [Obsolete]
     public void TearDown()
     {
         _server.Dispose();

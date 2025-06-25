@@ -40,7 +40,7 @@ namespace ServeSharp.NetHttp
                 // test method
                 if (Method != context.Http.Request.Method) return false;
             }
-            
+
             // test path
             var ret = Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out var bindings);
             context.Http.UrlBindings = bindings;

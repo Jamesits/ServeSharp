@@ -5,7 +5,7 @@ namespace ServeSharp.Core.Test;
 
 public class PathParserTest
 {
-    private Parser<RouteToken, Matcher> _parser;
+    private Parser<RouteToken, Matcher>? _parser;
 
     [SetUp]
     public void Setup()

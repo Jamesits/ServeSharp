@@ -5,12 +5,12 @@ namespace ServeSharp.NetHttp.Test;
 
 public class RouterTest
 {
-    private Router _router;
+    private Router? _router;
     [SetUp]
     public void Setup()
     {
         _router = new Router();
-        
+
         // recovery
         _router.Use(recovery);
 
@@ -41,7 +41,7 @@ public class RouterTest
         });
         _router.Group("/group1").Any("/any", (context, _) =>
         {
-            Console.WriteLine("Any"); 
+            Console.WriteLine("Any");
             return Middleware.CompletedTask;
         });
 

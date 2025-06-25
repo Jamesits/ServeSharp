@@ -25,7 +25,7 @@ namespace ServeSharp.Core.Path
         public RootMatcher() { }
 
         public RootMatcher(params Matcher[] matchers) => _matchers.AddRange(matchers);
-        
+
         public void Add(Matcher matcher) => _matchers.Add(matcher);
 
         public override string ToString()
@@ -90,8 +90,8 @@ namespace ServeSharp.Core.Path
     {
         private readonly List<Matcher> _matchers = new List<Matcher>();
 
-        public AggregatedMatcher() {}
-        public AggregatedMatcher(params Matcher []matchers)
+        public AggregatedMatcher() { }
+        public AggregatedMatcher(params Matcher[] matchers)
         {
             _matchers.AddRange(matchers);
         }
