@@ -8,6 +8,8 @@ Note: Before v1.0.0, APIs are due to heavy change.
 
 ## Usage
 
+### Choose an Implementation Path
+
 There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one that has been implemented by this project, just use it. Otherwise, use our core infrastructure to create a router for your request/response type in no time.
 
 Implemented:
@@ -15,14 +17,25 @@ Implemented:
 | Package | Request | Response | Implementation | Status |
 | ------- | ------- | -------- | -------------- | ------ |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
-| [CefSharp.Core](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ [Example Project](/ServeSharp.CefSharpCore.Example.WPF)|
-| ASP.NET Core (Kestrel or HTTP.sys) | `Microsoft.AspNetCore.Http.Request` | `Microsoft.AspNetCore.Http.Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ [Example Project](/ServeSharp.AspNetCore.Example.Cli) |
+| [CefSharp.Core](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ |
+| ASP.NET Core (Kestrel or HTTP.sys) | `Microsoft.AspNetCore.Http.Request` | `Microsoft.AspNetCore.Http.Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ |
 
-### Using an Existing Server
+<details>
+<summary>Using an Existing Server</summary>
 
-See [ServeSharp.AspNetCore.Example.Cli](/ServeSharp.AspNetCore.Example.Cli) for an example of using the router with the Kestrel server.
+- Kestrel web server or HTTP.sys: [ServeSharp.AspNetCore.Example.Cli](/ServeSharp.AspNetCore.Example.Cli)
 
-### Using an Existing Router
+</details>
+
+<details>
+<summary>Using an Existing Embedding Option</summary>
+
+- CefSharp with custom resource handler: [ServeSharp.CefSharpCore.Example.WPF](/ServeSharp.CefSharpCore.Example.WPF)
+
+</details>
+
+<details>
+<summary>Using an Existing Router</summary>
 
 ```csharp
 using ServeSharp.Core.Middleware;
@@ -67,7 +80,10 @@ private class MyServer {
 
 ```
 
-### Porting a New Router
+</details>
+
+<details>
+<summary>Porting a New Router</summary>
 
 Steps:
 
@@ -75,6 +91,16 @@ Steps:
 - Implement a [`class Route`](/ServeSharp.NetHttp/Route.cs)
 - Implement a [`class RouteGroup`](/ServeSharp.NetHttp/RouteGroup.cs)
 - Implement a [`class Router`](/ServeSharp.NetHttp/Router.cs)
+
+</details>
+
+### Routing
+
+[TBD]
+
+### Middleware
+
+[TBD]
 
 ## FAQs
 
