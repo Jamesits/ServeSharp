@@ -1,6 +1,6 @@
 name: Test (.NET Core)
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-  
+
       - name: Setup dotnet ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
         with:
