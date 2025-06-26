@@ -2,7 +2,7 @@
 
 HTTP router and middleware in C# that does not depend on any web framework.
 
-![Works - On My Machine](https://img.shields.io/badge/Works-On_My_Machine-2ea44f)![Project Status - Premature](https://img.shields.io/badge/Project_Status-Premature-yellow)
+![Works - On My Machine](https://img.shields.io/badge/Works-On_My_Machine-2ea44f) ![Project Status - Premature](https://img.shields.io/badge/Project_Status-Premature-yellow)
 
 Note: Before v1.0.0, APIs are due to heavy change.
 
@@ -82,3 +82,5 @@ C#/.NET have a lot good web frameworks, but there is not one HTTP router impleme
 ## Thanks
 
 This project is sponsored by [Yet Another AI Ltd.](https://www.yetanother.ai/).
+
+The API is heavy influenced by [Flamego](https://flamego.dev/).
