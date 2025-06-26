@@ -15,11 +15,12 @@ Implemented:
 | Package | Request | Response | Implementation | Status |
 | ------- | ------- | -------- | -------------- | ------ |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
-| [CefSharp](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ (.NET Core only) [Example Project](/ServeSharp.CefSharpCore.Example.WPF)|
+| [CefSharp.Core](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ [Example Project](/ServeSharp.CefSharpCore.Example.WPF)|
+| ASP.NET Core (Kestrel or HTTP.sys) | `Microsoft.AspNetCore.Http.Request` | `Microsoft.AspNetCore.Http.Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ [Example Project](/ServeSharp.AspNetCore.Example.Cli) |
 
 ### Using an Existing Server
 
-[TBD] There are no working servers for now.
+See [ServeSharp.AspNetCore.Example.Cli](/ServeSharp.AspNetCore.Example.Cli) for an example of using the router with the Kestrel server.
 
 ### Using an Existing Router
 
