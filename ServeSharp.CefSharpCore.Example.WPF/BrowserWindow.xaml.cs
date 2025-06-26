@@ -27,12 +27,13 @@ public partial class BrowserWindow : Window, IDisposable
         _server.Router.Get("/", (context, _) =>
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Http.ResourceHandler, nameof(context.Http.ResourceHandler));
 
-            context.Http.ResourceHandler.Continue = true;
-            context.Http.ResourceHandler.StatusCode = 200;
-            context.Http.ResourceHandler.MimeType = "text/html";
-            context.Http.ResourceHandler.Stream = new MemoryStream("<h1>It works!</h1>"u8.ToArray());
+            context.Http.ResourceHandler = new ContinuingResourceHandler()
+            {
+                StatusCode = 200,
+                MimeType = "text/html",
+                Stream = new MemoryStream("<h1>It works!</h1>"u8.ToArray()),
+            };
             return Middleware.CompletedTask;
         });
 

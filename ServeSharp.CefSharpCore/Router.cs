@@ -60,10 +60,13 @@ public class Router : IPathGroup<Context, Route>
 
     private static Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
     {
-        context.Http.ResourceHandler.Continue = true;
-        context.Http.ResourceHandler.StatusCode = 404;
-        context.Http.ResourceHandler.MimeType = "text/plain";
-        context.Http.ResourceHandler.Stream = new MemoryStream("404 Not Found"u8.ToArray());
+        var handler = new ContinuingResourceHandler()
+        {
+            StatusCode = 404,
+            MimeType = "text/plain",
+            Stream = new MemoryStream("404 Not Found"u8.ToArray())
+        };
+        context.Http.ResourceHandler = handler;
         return Middleware.CompletedTask;
     }
 

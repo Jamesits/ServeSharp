@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+#pragma warning disable CA1707
 using sly.lexer;
 
 namespace ServeSharp.Core.Path;

@@ -15,6 +15,7 @@ Implemented:
 | Package | Request | Response | Implementation | Status |
 | ------- | ------- | -------- | -------------- | ------ |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
+| [CefSharp](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ (.NET Core only) [Example Project](/ServeSharp.CefSharpCore.Example.WPF)|
 
 ### Using an Existing Server
 

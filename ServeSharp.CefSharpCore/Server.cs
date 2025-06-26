@@ -41,15 +41,14 @@ public class Server : IDisposable, ISchemeHandlerFactory
         context.Http.Frame = frame;
         context.Http.SchemeName = schemeName;
         context.Http.Request = request;
-        context.Http.ResourceHandler = new ResourceHandler();
 
         Task.Run(async () =>
         {
             await Router.Handle(context);
         }).GetAwaiter().GetResult();
 
-        // do not dispose the ResourceHandler now
-        var ret = context.Http.ResourceHandler;
+        // do not dispose the ContinuingResourceHandler with the context
+        var ret = context.Http.ResourceHandler ?? new CancellingResourceHandler();
         context.Http.ResourceHandler = null;
         return ret;
     }
