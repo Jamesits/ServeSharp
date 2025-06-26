@@ -3,12 +3,12 @@ using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;
 
-internal interface ICustomContext
+public interface ICustomContext
 {
     public string CustomItem1 { get; set; }
 }
 
-internal static class CustomContextMiddleware
+public static class CustomContextMiddleware
 {
     public static ICustomContext CustomContext(this Context context) => context.Get<ICustomContext>();
 

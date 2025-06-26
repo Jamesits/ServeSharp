@@ -5,7 +5,7 @@ namespace ServeSharp.Core.Test;
 
 // Note: exception handling does not exist here, since we don't have a stack.
 // Only pauses and continuations can be tested here.
-internal class MiddlewareTest
+public class MiddlewareTest
 {
     [SetUp]
     public void Setup() { }

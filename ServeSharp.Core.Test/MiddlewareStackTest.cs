@@ -3,7 +3,7 @@ using ServeSharp.Core.Middleware;
 
 namespace ServeSharp.Core.Test;
 
-internal class MiddlewareStackTest
+public class MiddlewareStackTest
 {
     [SetUp]
     public void Setup() { }
@@ -231,20 +231,19 @@ internal class MiddlewareStackTest
             [101, 201, 1001, 301, 1002, 1003, 209, 109]);
     }
 
-    private static async Middleware.Middleware Execute(MiddlewareStack<ConcurrentQueue<int>> stack,
+    private async Middleware.Middleware Execute(MiddlewareStack<ConcurrentQueue<int>> stack,
         int[] expectedSeq)
     {
         var resultQueue = new ConcurrentQueue<int>();
-        var next = new StackingAwaiter();
         try
         {
+            await using var next = new StackingAwaiter();
             await stack.Handle(resultQueue, next);
         }
         finally
         {
-            await next.DisposeAsync().ConfigureAwait(false);
-            Console.WriteLine($"Expected: [{string.Join(", ", expectedSeq)}]");
-            Console.WriteLine($"Actual: [{string.Join(", ", resultQueue)}]");
+            Console.WriteLine("Expected: [{0}]", string.Join(", ", expectedSeq));
+            Console.WriteLine("Actual: [{0}]", string.Join(", ", resultQueue));
 
             if (!expectedSeq.SequenceEqual(resultQueue))
             {
