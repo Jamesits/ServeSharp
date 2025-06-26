@@ -8,7 +8,7 @@ public delegate Middleware HandleFunc<in T>(T context, IAwaitable next);
 
 public class MiddlewareStack<T>
 {
-    private readonly List<HandleFunc<T>> _handles = new List<HandleFunc<T>>();
+    private readonly List<HandleFunc<T>> _handles = [];
 
     public MiddlewareStack() { }
 
@@ -27,7 +27,9 @@ public class MiddlewareStack<T>
             {
                 await h(context, next);
             }
+#pragma warning disable CA1031
             catch (Exception ex)
+#pragma warning restore CA1031
             {
                 // If an exception is thrown anywhere inside the top half of the invocation
                 // queue the exception back into the stack top function's `await` invocation

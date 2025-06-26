@@ -48,7 +48,10 @@ public class Server : IDisposable, ISchemeHandlerFactory
             await Router.Handle(context);
         }).GetAwaiter().GetResult();
 
-        return context.Http.ResourceHandler;
+        // do not dispose the ResourceHandler now
+        var ret = context.Http.ResourceHandler;
+        context.Http.ResourceHandler = null;
+        return ret;
     }
     #endregion
 }

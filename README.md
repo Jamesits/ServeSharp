@@ -12,8 +12,8 @@ There are a lot HTTP request/response class implementations in the C#/.NET ecosy
 
 Implemented:
 
-| Namespace | Request | Response | Implementation | Status |
-| --------- | ------- | -------- | -------------- | ------ |
+| Package | Request | Response | Implementation | Status |
+| ------- | ------- | -------- | -------------- | ------ |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
 
 ### Using an Existing Server

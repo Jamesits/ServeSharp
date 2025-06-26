@@ -14,8 +14,7 @@ public class GenericProperty<T>
         return new GenericProperty<T> { Value = value };
     }
 
-    public T ToT()
-    {
-        throw new System.NotImplementedException();
-    }
+    public T ToT() => Value;
+
+    public GenericProperty<T> ToGenericProperty() => this;
 }

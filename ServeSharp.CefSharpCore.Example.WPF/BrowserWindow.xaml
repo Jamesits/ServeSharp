@@ -9,7 +9,7 @@
         Title="BrowserWindow" Height="450" Width="800">
     <Grid>
         <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0,1">
-            <!-- <wpf:ChromiumWebBrowser x:Name="Browser" Address="www.google.com"/> -->
+             <wpf:ChromiumWebBrowser x:Name="Browser" Address="res://localhost/"/> 
         </Border>
     </Grid>
 </Window>

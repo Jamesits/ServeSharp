@@ -1,14 +1,14 @@
 <Project>
-	<PropertyGroup>
-		<LangVersion>12.0</LangVersion>
-	</PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>12.0</LangVersion>
+    </PropertyGroup>
 
-	<!-- Waiting for https://github.com/Sergio0694/PolySharp/issues/50
-	<ItemGroup>
-		<PackageReference Include="PolySharp" Version="1.15.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-	-->
+    <!-- Waiting for https://github.com/Sergio0694/PolySharp/issues/50
+    <ItemGroup>
+        <PackageReference Include="PolySharp" Version="1.15.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+    -->
 </Project>

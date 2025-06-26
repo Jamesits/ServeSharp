@@ -13,7 +13,7 @@ public class RouteGroup : IPathGroup<Context, Route>
 {
     private readonly IPathGroup<Context, Route> _parent;
     private readonly string _path;
-    private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
+    private readonly List<HandleFunc<Context>> _middlewares = [];
 
     public RouteGroup(IPathGroup<Context, Route> parent, string path)
     {

@@ -12,7 +12,7 @@ public interface IHttp
     public IRequest Request { get; set; }
 
     // response
-    public ResourceHandler ResourceHandler { get; set; }
+    public ResourceHandler? ResourceHandler { get; set; }
 
     public Dictionary<string, string>? UrlBindings { get; set; }
 }

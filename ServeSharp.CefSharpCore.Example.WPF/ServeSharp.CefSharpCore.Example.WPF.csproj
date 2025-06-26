@@ -26,12 +26,12 @@
     <WarningLevel>9999</WarningLevel>
   </PropertyGroup>
 
-  <!-- <ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CefSharp.Wpf.NETCore" Version="137.0.100" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj" />
-  </ItemGroup> -->
+  </ItemGroup>
 
 </Project>

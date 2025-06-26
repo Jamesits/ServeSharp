@@ -11,9 +11,9 @@ namespace ServeSharp.CefSharpCore;
 
 public class Router : IPathGroup<Context, Route>
 {
-    private readonly List<Route> _routes = new List<Route>();
+    private readonly List<Route> _routes = [];
     private readonly Parser<RouteToken, Matcher> _parser = Parser.New();
-    private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
+    private readonly List<HandleFunc<Context>> _middlewares = [];
 
     public bool AutoHead { get; set; } = true;
     public HandleFunc<Context> NotFound { private get; set; } = DefaultNotFoundHandler;
@@ -62,7 +62,6 @@ public class Router : IPathGroup<Context, Route>
     {
         context.Http.ResourceHandler.Continue = true;
         context.Http.ResourceHandler.StatusCode = 404;
-        context.Http.ResourceHandler.StatusText = "Not Found";
         context.Http.ResourceHandler.MimeType = "text/plain";
         context.Http.ResourceHandler.Stream = new MemoryStream("404 Not Found"u8.ToArray());
         return Middleware.CompletedTask;

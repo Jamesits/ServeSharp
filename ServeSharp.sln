@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore", "ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj", "{ADB2F7B9-1580-442E-B580-3997574FA8DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore.Example.WPF", "ServeSharp.CefSharpCore.Example.WPF\ServeSharp.CefSharpCore.Example.WPF.csproj", "{88ABEC71-32B3-4C03-BDC2-50CC00EABA40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore.Example.WPF", "ServeSharp.CefSharpCore.Example.WPF\ServeSharp.CefSharpCore.Example.WPF.csproj", "{7BBA9C22-19D8-469E-8C00-4755258E1084}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,10 +56,10 @@ Global
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88ABEC71-32B3-4C03-BDC2-50CC00EABA40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88ABEC71-32B3-4C03-BDC2-50CC00EABA40}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88ABEC71-32B3-4C03-BDC2-50CC00EABA40}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88ABEC71-32B3-4C03-BDC2-50CC00EABA40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
