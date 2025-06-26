@@ -1,0 +1,55 @@
+name: Test (.NET Core)
+
+on: [push, pull_request]
+
+jobs:
+  test-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '8.x', '10.x' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+          cache: true
+          cache-dependency-path: '*/packages.lock.json'
+
+      - name: Restore
+        run: dotnet restore --locked-mode
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Unit Tests
+        run: dotnet test --no-build --configuration Release
+
+  test-linux:
+    runs-on: linux-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '8.x', '10.x' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+          cache: true
+          cache-dependency-path: '*/packages.lock.json'
+
+      # error NU1004: The project's runtime identifiers have changed from. Project's runtime identifiers: linux-x64, lock file's runtime identifiers win-x64.The packages lock file is inconsistent with the project dependencies so restore can't be run in locked mode. Disable the RestoreLockedMode MSBuild property or pass an explicit --force-evaluate option to run restore to update the lock file.
+      - name: Restore
+        run: dotnet restore --locked-mode --force-evaluate
+
+      - name: Build
+        run: dotnet build --no-restore --configuration ReleaseLinux
+
+      - name: Unit Tests
+        run: dotnet test --no-build --configuration ReleaseLinux

@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{25D9EF46-B6B3-47AD-9959-23E59C850283}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\netcore-test.yml = .github\workflows\netcore-test.yml
+		.github\workflows\test-netcore.yml = .github\workflows\test-netcore.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore", "ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj", "{ADB2F7B9-1580-442E-B580-3997574FA8DE}"
@@ -34,44 +34,44 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-		TestingCiReleaseLinux|Any CPU = TestingCiReleaseLinux|Any CPU
+		ReleaseLinux|Any CPU = ReleaseLinux|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
-		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.TestingCiReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{485FCACE-F483-4A85-87FA-24E0A5ADE12B}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
-		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.TestingCiReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{5CC5DF3A-2C16-4393-A476-B3F7F980239A}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
-		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.TestingCiReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
-		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.TestingCiReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
-		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.TestingCiReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{ADB2F7B9-1580-442E-B580-3997574FA8DE}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BBA9C22-19D8-469E-8C00-4755258E1084}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7BBA9C22-19D8-469E-8C00-4755258E1084}.TestingCiReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{7BBA9C22-19D8-469E-8C00-4755258E1084}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
