@@ -10,15 +10,17 @@ Note: Before v1.0.0, APIs are due to heavy change.
 
 ### Choose an Implementation Path
 
-There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one that has been implemented by this project, just use it. Otherwise, use our core infrastructure to create a router for your request/response type in no time.
+ServeSharp is implemented in a very modular way that you can use it as a standalone HTTP server, as a middleware for an existing server, or just a router for any RPC-like request/response interface.
+
+There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one listed below, just use the specific package. Otherwise, use `ServeSharp.Core` to create a router for your request/response type in less than 50 lines of code.
 
 Implemented:
 
 | Package | Request | Response | Implementation | Status |
 | ------- | ------- | -------- | -------------- | ------ |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
-| [CefSharp.Core](https://github.com/cefsharp/CefSharp) | `CefSharp.IRequest` | `CefSharp.IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ |
-| ASP.NET Core (Kestrel or HTTP.sys) | `Microsoft.AspNetCore.Http.Request` | `Microsoft.AspNetCore.Http.Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ |
+| [CefSharp](https://github.com/cefsharp/CefSharp) | `IRequest` | `IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ |
+| `Microsoft.AspNetCore.Http` | `Request` | `Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ |
 
 <details>
 <summary>Using an Existing Server</summary>
@@ -94,13 +96,80 @@ Steps:
 
 </details>
 
-### Routing
-
-[TBD]
-
 ### Middleware
 
-[TBD]
+When a route is matched, the router will pass the context to a chain of middlewares. Each middleware can do something before and after the next middleware is called. A route handler is also a middleware.
+
+Use `Router.Use(middleware1, [middleware2, ...])` to add middlewares to the router. The middlewares will be executed in the order they are added. Middleware is only effective for the routes that are added after it.
+
+<details>
+<summary>Route Handler</summary>
+
+```csharp
+// async route handler
+public async Middleware GetRoot(Context context, IAwaitable _) {
+    // set the response content
+    context.Http.Response.Content = await Task.FromResult("Hello, world!");
+}
+
+// sync route handler
+public Middleware GetRoot(Context context, IAwaitable _) {
+    // set the response content
+    context.Http.Response.Content = "Hello, world!";
+
+    // no need to call next, as this is the end of the middleware chain
+    return Middleware.CompletedTask;
+}
+```
+
+</details>
+
+<details>
+<summary>Logger Middleware</summary>
+
+```csharp
+// async middleware
+public async Middleware CustomLogger(Context context, IAwaitable next) {
+    // do something before
+    Console.WriteLine("Before");
+
+    // call the next middleware
+    await next;
+
+    // do something after
+    Console.WriteLine("After");
+}
+
+// sync middleware
+public Middleware CustomLogger(Context context, IAwaitable next) {
+    // do something before
+    Console.WriteLine("Before");
+
+    // call the next middleware
+    next.GetAwaiter().GetResult();
+
+    // do something after
+    Console.WriteLine("After");
+
+    return Middleware.CompletedTask;
+}
+```
+
+</details>
+
+### Routing
+
+Add routes to the router using `Router.Get`, `Router.Post`, `Router.Put`, `Router.Delete`, `Router.Any`, etc. Each route can have a path and a handler middleware. The path can contain parameters, which will be extracted from the request URL when the route is matched.
+
+Supported formats:
+
+- `/path/to/resource`: exact match
+- `/path/{param}`: parameter will match any string until the next `/` or the end of the path
+- `/path/{param: splat}`: parameter will match any string until the end of the path
+- `/path/{param: splat(N)}`: parameter will match N segments separated by `/`
+- `/path/{param: /regex/}`: parameter will match the regex pattern (including any `/` if the regex permits)
+
+You can read the parameter values from `context.Http.UrlBindings`.
 
 ## FAQs
 
