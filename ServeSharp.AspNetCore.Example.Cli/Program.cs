@@ -17,5 +17,5 @@ server.Router.Get("/", async (context, _) =>
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-7.0#wildcard-and-catch-all-routes
-app.Map("/{*all}", server.Serve);
+app.Map("/{*_}", server.Serve);
 app.Run();
