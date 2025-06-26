@@ -10,11 +10,9 @@ Note: Before v1.0.0, APIs are due to heavy change.
 
 ### Choose an Implementation Path
 
-ServeSharp is implemented in a very modular way that you can use it as a standalone HTTP server, as a middleware for an existing server, or just a router for any RPC-like request/response interface.
+ServeSharp can be used as a standalone HTTP server, a middleware for an existing HTTP server, an in-process server for a webview frontend, or a router for any RPC-like request/response interface.
 
-There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one listed below, just use the specific package. Otherwise, use `ServeSharp.Core` to create a router for your request/response type in less than 50 lines of code.
-
-Implemented:
+There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one listed below, use the specific package. Otherwise, use `ServeSharp.Core` to create a router for your request/response type in less than 50 lines of code.
 
 | Package | Request | Response | Implementation | Status |
 | ------- | ------- | -------- | -------------- | ------ |
@@ -207,7 +205,7 @@ System.MissingMethodException: Method not found: ...
 
 This is because this package uses an older version of target framework for maximum compatibility, which might cause CLR to not find some methods when the function invocation passes through the middleware chain. To fix this, use the package-provided version of these functions (e.g. `dotnet add System.Text.Json`) rather than using the framework-provided one. [Here is an excellent article explaining why this happens](https://sergeyteplyakov.github.io/Blog/csharp/2024/03/21/Mythical_MissingMethodException.html).
 
-## Thanks
+## Acknowledgements
 
 This project is sponsored by [Yet Another AI Ltd.](https://www.yetanother.ai/).
 
