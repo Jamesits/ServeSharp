@@ -163,7 +163,7 @@ public Middleware CustomLogger(Context context, IAwaitable next) {
 If any middleware throws an exception, the exception is wrapped in an `AggregatedException`(to preserve the original stack informat) then bubbled up to every middleware in the chain on top of the one that threw the exception. You can catch and handle the exception [as described in the documentation](https://learn.microsoft.com/en-us/dotnet/api/system.aggregateexception.flatten#examples).
 
 ```csharp
-public async Middleware CustomLogger(Context context, IAwaitable next) {
+public async Middleware Recovery(Context context, IAwaitable next) {
     try {
         await next;
     } catch (AggregateException ex) {
