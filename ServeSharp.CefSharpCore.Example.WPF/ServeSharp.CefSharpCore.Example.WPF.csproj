@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net8.0-windows</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>True</UseWPF>
+    <UseCurrentRuntimeIdentifier Condition="'$(UseCurrentRuntimeIdentifier)' == ''">true</UseCurrentRuntimeIdentifier>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
+    <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <RepositoryUrl>https://github.com/Jamesits/ServeSharp.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Jamesits/ServeSharp</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows|AnyCPU'">
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows|AnyCPU'">
+    <WarningLevel>9999</WarningLevel>
+  </PropertyGroup>
+
+  <!-- <ItemGroup>
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="137.0.100" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj" />
+  </ItemGroup> -->
+
+</Project>

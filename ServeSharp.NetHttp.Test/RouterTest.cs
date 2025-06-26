@@ -3,7 +3,7 @@ using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;
 
-public class RouterTest
+internal class RouterTest
 {
     private Router? _router;
     [SetUp]

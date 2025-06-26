@@ -3,7 +3,7 @@ using sly.parser;
 
 namespace ServeSharp.Core.Test;
 
-public class PathParserTest
+internal class PathParserTest
 {
     private Parser<RouteToken, Matcher>? _parser;
 

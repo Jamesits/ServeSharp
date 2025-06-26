@@ -2,51 +2,50 @@
 // ReSharper disable IdentifierTypo
 using sly.lexer;
 
-namespace ServeSharp.Core.Path
+namespace ServeSharp.Core.Path;
+
+public enum RouteToken
 {
-    public enum RouteToken
-    {
-        [Sugar("/")]
-        ROOT,
+    [Sugar("/")]
+    ROOT,
 
-        [CustomId("-_0-9a-zA-Z.~!$&'()*+,;=:%", "-_0-9a-zA-Z.~!$&'()*+,;=:%")]
-        PCHARS,
+    [CustomId("-_0-9a-zA-Z.~!$&'()*+,;=:%", "-_0-9a-zA-Z.~!$&'()*+,;=:%")]
+    PCHARS,
 
-        [Sugar("{")]
-        [Push("bind")]
-        BIND_START,
+    [Sugar("{")]
+    [Push("bind")]
+    BIND_START,
 
-        [Sugar("}")]
-        [Mode("bind")]
-        [Pop]
-        BIND_END,
+    [Sugar("}")]
+    [Mode("bind")]
+    [Pop]
+    BIND_END,
 
-        [Sugar(":")]
-        [Mode("bind")]
-        BIND_SEP,
+    [Sugar(":")]
+    [Mode("bind")]
+    BIND_SEP,
 
-        [AlphaNumDashId]
-        [Mode("bind")]
-        BIND_DST,
+    [AlphaNumDashId]
+    [Mode("bind")]
+    BIND_DST,
 
-        [String("/", "\\")]
-        [Mode("bind")]
-        BIND_REGEXP,
+    [String("/", "\\")]
+    [Mode("bind")]
+    BIND_REGEXP,
 
-        [Keyword("splat")]
-        [Mode("bind")]
-        BIND_SPLAT,
+    [Keyword("splat")]
+    [Mode("bind")]
+    BIND_SPLAT,
 
-        [Sugar("(")]
-        [Mode("bind")]
-        BRACKET_L,
+    [Sugar("(")]
+    [Mode("bind")]
+    BRACKET_L,
 
-        [Int]
-        [Mode("bind")]
-        BIND_SPLAT_COUNT,
+    [Int]
+    [Mode("bind")]
+    BIND_SPLAT_COUNT,
 
-        [Sugar(")")]
-        [Mode("bind")]
-        BRACKET_R,
-    }
+    [Sugar(")")]
+    [Mode("bind")]
+    BRACKET_R,
 }

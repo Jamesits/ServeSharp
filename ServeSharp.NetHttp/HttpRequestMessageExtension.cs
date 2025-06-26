@@ -1,7 +1,6 @@
-﻿namespace ServeSharp.NetHttp
-{
-    public static class HttpRequestMessageExtension
-    {
+﻿namespace ServeSharp.NetHttp;
 
-    }
+public static class HttpRequestMessageExtension
+{
+
 }

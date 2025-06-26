@@ -4,7 +4,7 @@ using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;
 
-public class ServerTest
+internal class ServerTest
 {
     [Obsolete]
     private Server? _server;

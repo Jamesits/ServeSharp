@@ -1,14 +1,13 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using ServeSharp.Core.Middleware;
-using System.Net.Http;
-using System.Text;
+﻿using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 using sly.parser;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
 
-namespace ServeSharp.NetHttp;
+namespace ServeSharp.CefSharpCore;
 
 public class Router : IPathGroup<Context, Route>
 {
@@ -59,9 +58,13 @@ public class Router : IPathGroup<Context, Route>
         }
     }
 
-    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
+    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
     {
-        Console.WriteLine("404 NOT FOUND");
+        context.Http.ResourceHandler.Continue = true;
+        context.Http.ResourceHandler.StatusCode = 404;
+        context.Http.ResourceHandler.StatusText = "Not Found";
+        context.Http.ResourceHandler.MimeType = "text/plain";
+        context.Http.ResourceHandler.Stream = new MemoryStream("404 Not Found"u8.ToArray());
         return Middleware.CompletedTask;
     }
 

@@ -1,10 +1,9 @@
-﻿#nullable enable
+﻿using ServeSharp.Core.Middleware;
+using ServeSharp.Core.Path;
 using System;
 using System.Net.Http;
-using ServeSharp.Core.Middleware;
-using ServeSharp.Core.Path;
 
-namespace ServeSharp.NetHttp;
+namespace ServeSharp.CefSharpCore;
 
 public class Route
 {
@@ -38,14 +37,16 @@ public class Route
         if (Method != null)
         {
             // test method
-            if (Method != context.Http.Request.Method) return false;
+            if (Method.ToString() != context.Http.Request.Method) return false;
         }
 
         // test path
-        var ret = Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out var bindings);
+        var url = new Uri(context.Http.Request.Url);
+        var ret = Matcher.Match(url.AbsolutePath, out _, out var bindings);
         context.Http.UrlBindings = bindings;
         return ret;
     }
 
     public MiddlewareStack<Context> Stack => new MiddlewareStack<Context>(_handlers);
 }
+
