@@ -157,6 +157,26 @@ public Middleware CustomLogger(Context context, IAwaitable next) {
 
 </details>
 
+<details>
+<summary>Exception Handling (Recovery) Middleware</summary>
+
+If any middleware throws an exception, the exception is wrapped in an `AggregatedException`(to preserve the original stack informat) then bubbled up to every middleware in the chain on top of the one that threw the exception. You can catch and handle the exception [as described in the documentation](https://learn.microsoft.com/en-us/dotnet/api/system.aggregateexception.flatten#examples).
+
+```csharp
+public async Middleware CustomLogger(Context context, IAwaitable next) {
+    try {
+        await next;
+    } catch (AggregateException ex) {
+        // handle the exception
+        foreach (var e in ex.Flatten().InnerExceptions) {
+            Console.WriteLine(e.Message);
+        }
+    }
+}
+```
+
+</details>
+
 ### Routing
 
 Add routes to the router using `Router.Get`, `Router.Post`, `Router.Put`, `Router.Delete`, `Router.Any`, etc. Each route can have a path and a handler middleware. The path can contain parameters, which will be extracted from the request URL when the route is matched.
