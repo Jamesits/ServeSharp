@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using CefSharp;
+using CefSharp.DevTools.Network;
 using CefSharp.Wpf;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
@@ -19,7 +20,8 @@ public partial class BrowserWindow : Window, IDisposable
 {
     private bool _disposed;
     private readonly Server _server;
-    private readonly CefSettings _settings;
+    private readonly CefSettings _cefSettings;
+    private readonly BrowserSettings _browserSettings;
 
     public BrowserWindow()
     {
@@ -37,18 +39,21 @@ public partial class BrowserWindow : Window, IDisposable
             return Middleware.CompletedTask;
         });
 
-        _settings = new CefSettings()
-        {
-            LogSeverity = LogSeverity.Verbose,
-        };
-        _settings.RegisterScheme(new CefCustomScheme
+        _cefSettings = new CefSettings();
+        _cefSettings.RegisterScheme(new CefCustomScheme
         {
             SchemeName = "res",
             SchemeHandlerFactory = _server,
         });
-        Cef.Initialize(_settings);
+        Cef.Initialize(_cefSettings);
 
         InitializeComponent();
+
+        var browserSettings = new BrowserSettings
+        {
+            WindowlessFrameRate = 60,
+        };
+        Browser.BrowserSettings = browserSettings;
     }
 
     protected virtual void Dispose(bool disposing)
@@ -57,7 +62,8 @@ public partial class BrowserWindow : Window, IDisposable
         if (disposing)
         {
             Cef.Shutdown();
-            _settings.Dispose();
+            _browserSettings.Dispose();
+            _cefSettings.Dispose();
             _server?.Dispose();
         }
 
