@@ -5,9 +5,6 @@ on:
     tags:
       - "v*"
 
-env:
-  VERSION: "0.0.0"
-
 jobs:
   publish:
     runs-on: windows-latest
@@ -23,7 +20,7 @@ jobs:
 
       # parse version
       - name: Parse Version (Tagged)
-        if: github.ref_type == 'tag'
+        id: ver
         run: echo "VERSION=${${{ github.ref_name }}#?}" | tee -a "$GITHUB_ENV"
 
       - name: Setup dotnet ${{ matrix.dotnet-version }}
@@ -37,14 +34,13 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release -p:VersionPrefix=${{VERSION}}
+        run: dotnet build --no-restore --configuration Release -p:VersionPrefix=${{steps.ver.outputs.VERSION}}
 
       - name: Unit Tests
         run: dotnet test --no-build --configuration Release
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'
         with:
           files: |
             "**/*.nupkg"
