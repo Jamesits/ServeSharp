@@ -18,10 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # parse version
-      - name: Parse Version (Tagged)
-        id: ver
-        run: echo "VERSION=${${{ github.ref_name }}#?}" | tee -a "$GITHUB_ENV"
+      # https://github.com/orgs/community/discussions/26686#discussioncomment-3252850
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace(/\/refs\/tags\/v/, '');
 
       - name: Setup dotnet ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
@@ -34,7 +38,7 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release -p:VersionPrefix=${{steps.ver.outputs.VERSION}}
+        run: dotnet build --no-restore --configuration Release -p:VersionPrefix=${{ steps.tag.outputs.result }}
 
       - name: Unit Tests
         run: dotnet test --no-build --configuration Release
