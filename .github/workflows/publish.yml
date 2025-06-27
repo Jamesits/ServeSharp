@@ -48,7 +48,7 @@ jobs:
         with:
           prerelease: true
           files: |
-            "**\*.nupkg"
+            **/*.nupkg
 
       - name: Publish
         if: github.ref_type == 'tag'
