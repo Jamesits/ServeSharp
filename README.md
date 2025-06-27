@@ -14,11 +14,11 @@ ServeSharp can be used as a standalone HTTP server, a middleware for an existing
 
 There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one listed below, use the specific package. Otherwise, use `ServeSharp.Core` to create a router for your request/response type in less than 50 lines of code.
 
-| Package | Request | Response | Implementation | Status |
-| ------- | ------- | -------- | -------------- | ------ |
-| [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`HttpRequestMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httprequestmessage) | [`HttpResponseMessage`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpresponsemessage) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) | ✅ |
-| [CefSharp](https://github.com/cefsharp/CefSharp) | `IRequest` | `IResourceHandler` | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) | ✅ |
-| `Microsoft.AspNetCore.Http` | `Request` | `Response` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) | ✅ |
+| Package | Implementation |
+| ------- | -------------- |
+| [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) |
+| [CefSharp](https://github.com/cefsharp/CefSharp) | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) |
+| `Microsoft.AspNetCore.Http` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) |
 
 <details>
 <summary>Using an Existing Server</summary>
@@ -183,11 +183,14 @@ Supported formats:
 
 - `/path/to/resource`: exact match
 - `/path/{param}`: parameter will match any string until the next `/` or the end of the path
+- `/path/{param1}-{param2}-{param3}`: parameters will match non-greedy segments separated by your custom separator (e.g. `-` in this case)
 - `/path/{param: splat}`: parameter will match any string until the end of the path
 - `/path/{param: splat(N)}`: parameter will match N segments separated by `/`
 - `/path/{param: /regex/}`: parameter will match the regex pattern (including any `/` if the regex permits)
 
 You can read the parameter values from `context.Http.UrlBindings`.
+
+If mulitple rules match the same request, which one is used is undefined.
 
 ## FAQs
 

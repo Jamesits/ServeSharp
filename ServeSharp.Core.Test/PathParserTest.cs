@@ -17,8 +17,8 @@ internal class PathParserTest
     [Test]
     public void TestUnparsablePath()
     {
-        var src = @"/{";
-        var ret = _parser.Parse(src);
+        const string src = @"/{";
+        var ret = _parser!.Parse(src);
         Console.WriteLine(src);
         Assert.Throws<AggregateException>(() =>
         {
@@ -29,8 +29,8 @@ internal class PathParserTest
     [Test]
     public void TestRootPath()
     {
-        var src = @"/";
-        var ret = _parser.Parse(src);
+        const string src = @"/";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -43,8 +43,8 @@ internal class PathParserTest
     [Test]
     public void TestSimpleSubPath()
     {
-        var src = @"/path1/path2";
-        var ret = _parser.Parse(src);
+        const string src = @"/path1/path2";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -59,8 +59,8 @@ internal class PathParserTest
     [Test]
     public void TestSlashTerminatingSubPath()
     {
-        var src = @"/path1/path2/";
-        var ret = _parser.Parse(src);
+        const string src = @"/path1/path2/";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -76,10 +76,10 @@ internal class PathParserTest
     }
 
     [Test]
-    public void TestComplexMatchingPath1()
+    public void TestSegmentMultiRegex()
     {
-        var src = @"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html";
-        var ret = _parser.Parse(src);
+        const string src = @"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -100,14 +100,80 @@ internal class PathParserTest
     }
 
     [Test]
-    public void TestRegexMatchingMultipleSegmentsWithoutEnding()
+    public void TestSegmentMultiLiteralInEndingSegment()
     {
-        var src = @"/path1/{anything: /.*/}";
-        var ret = _parser.Parse(src);
+        const string src = @"/path1/aaa-{year}-{month}-{day}.html";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
 
+        AssertMatchPath(ret.Result, "/path1/aaa-2001-02-03.html", "", new Dictionary<string, string>
+        {
+            {"year", "2001"},
+            {"month", "02"},
+            {"day", "03"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa-2001-02-03-04.html", "", new Dictionary<string, string>
+        {
+            {"year", "2001"},
+            {"month", "02"},
+            {"day", "03-04"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa-2001-02-03040506.html", "", new Dictionary<string, string>
+        {
+            {"year", "2001"},
+            {"month", "02"},
+            {"day", "03040506"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/aaa-2001-02-03");
+        AssertNonMatchPath(ret.Result, "/path1/aaa-2001-02-03.htm");
+        AssertNonMatchPath(ret.Result, "/path1/aaa-2001-02-03/.html");
+        AssertNonMatchPath(ret.Result, "/path1/path2/aaa-2001-02-03.html");
+    }
+
+    [Test]
+    public void TestSegmentMultiLiteralInNonEndingSegment()
+    {
+        const string src = @"/path1/{year}aaa{month}bbb{day}/path2";
+        var ret = _parser!.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertMatchPath(ret.Result, "/path1/2001aaa02bbb03/path2", "", new Dictionary<string, string>
+        {
+            {"year", "2001"},
+            {"month", "02"},
+            {"day", "03"},
+        });
+        // non-greedy matching
+        AssertMatchPath(ret.Result, "/path1/xxx2001aaaa02bbbb04yy/path2", "", new Dictionary<string, string>
+        {
+            {"year", "xxx2001"},
+            {"month", "a02"},
+            {"day", "b04yy"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/2001aaa02bbb03/");
+        AssertNonMatchPath(ret.Result, "/path1/2001aaa02bbb03/path");
+        AssertNonMatchPath(ret.Result, "/path1/2001aaa02bbb03/path3");
+    }
+
+    [Test]
+    public void TestRegexMatchingMultipleSegmentsWithoutEnding()
+    {
+        const string src = @"/path1/{anything: /.*/}";
+        var ret = _parser!.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertMatchPath(ret.Result, "/path1/", "", new Dictionary<string, string>
+        {
+            {"anything", ""},
+        });
         AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
         {
             {"anything", "aaa"},
@@ -126,8 +192,8 @@ internal class PathParserTest
     public void TestRegexMatchingMultipleSegmentsWithEnding()
     {
         // Regex is greedy by design, so this path would never match
-        var src = @"/path1/{anything: /.*/}/path2/path3";
-        var ret = _parser.Parse(src);
+        const string src = @"/path1/{anything: /.*/}/path2/path3";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -141,8 +207,8 @@ internal class PathParserTest
     [Test]
     public void TestSplatAnything()
     {
-        var src = @"/path1/{anything: splat}";
-        var ret = _parser.Parse(src);
+        const string src = @"/path1/{anything: splat}";
+        var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
         Console.WriteLine(ret.Result);
@@ -170,7 +236,7 @@ internal class PathParserTest
     public void TestSplatAnythingWithEnding()
     {
         // Splat is greedy by design, so this path would never match
-        var src = @"/path1/{anything: splat}/aaa/bbb";
+        const string src = @"/path1/{anything: splat}/aaa/bbb";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
@@ -185,9 +251,33 @@ internal class PathParserTest
     }
 
     [Test]
-    public void TestSplitCount()
+    public void TestSplatCount1()
     {
-        var src = @"/path1/{anything: splat(2)}";
+        const string src = @"/path1/{anything: splat(1)}";
+        var ret = _parser.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertMatchPath(ret.Result, "/path1/", "", new Dictionary<string, string>
+        {
+            {"anything", ""},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1/aaa//");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/ccc");
+    }
+
+    [Test]
+    public void TestSplatCount2()
+    {
+        const string src = @"/path1/{anything: splat(2)}";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);
@@ -205,9 +295,9 @@ internal class PathParserTest
     }
 
     [Test]
-    public void TestSplitCountWithEnding()
+    public void TestSplatCount2WithEnding()
     {
-        var src = @"/path1/{anything: splat(2)}/aaa/bbb";
+        const string src = @"/path1/{anything: splat(2)}/aaa/bbb";
         var ret = _parser.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);

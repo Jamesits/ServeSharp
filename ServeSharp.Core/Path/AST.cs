@@ -12,6 +12,7 @@ namespace ServeSharp.Core.Path;
 /// </summary>
 public abstract class Matcher
 {
+    public static string PathSeparator { get; set; } = "/";
     public virtual bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
     {
         throw new NotImplementedException();
@@ -20,7 +21,7 @@ public abstract class Matcher
 
 public class RootMatcher : Matcher
 {
-    private readonly List<Matcher> _matchers = new List<Matcher>();
+    private readonly List<Matcher> _matchers = [];
 
     public RootMatcher() { }
 
@@ -31,13 +32,11 @@ public class RootMatcher : Matcher
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.AppendLine("[AST]");
         foreach (var matcher in _matchers)
         {
-            sb.AppendLine($"  /{matcher}");
+            sb.Append($"{PathSeparator}{matcher}");
         }
 
-        sb.AppendLine("");
         return sb.ToString();
     }
 
@@ -64,7 +63,7 @@ public class RootMatcher : Matcher
             }
 
             // every child matcher must start and end with a "/"
-            if (remainder[0] != '/')
+            if (!remainder.StartsWith(PathSeparator, StringComparison.Ordinal))
             {
                 return false;
             }
@@ -86,25 +85,45 @@ public class RootMatcher : Matcher
     }
 }
 
+/// <summary>
+/// Class <c>AggregatedMatcher</c> is just a bunch of matchers concatenated together.
+/// </summary>
 public class AggregatedMatcher : Matcher
 {
-    private readonly List<Matcher> _matchers = new List<Matcher>();
+    private readonly List<Matcher> _matchers = [];
 
     public AggregatedMatcher() { }
     public AggregatedMatcher(params Matcher[] matchers)
     {
-        _matchers.AddRange(matchers);
+        Add(matchers);
     }
 
-    public void Add(Matcher matcher) => _matchers.Add(matcher);
+    public void Add(params Matcher[] matcher)
+    {
+        if (matcher == null) throw new ArgumentNullException(nameof(matcher));
 
-    public override string ToString() => $"[Segment] {string.Join("", _matchers.Select(m => m.ToString()))}";
+        for (var i = 0; i < matcher.Length; i++)
+        {
+            // if BindingNonGreedyMatcher is followed by a StaticMatcher, it should stop when its remainder can be matched by the StaticMatcher.
+            // This is to support non-greedy binding inside a segment, e.g. `/path/{year}-{month}-{day}.html`
+            if ((i < matcher.Length - 1) && (matcher[i] is BindingNonGreedyMatcher bm) &&
+                (matcher[i + 1] is StaticMatcher sm))
+            {
+                bm.Terminator = sm.Destination;
+            }
+            
+            _matchers.Add(matcher[i]);
+        }
+    }
+
+    public override string ToString() => $"{string.Join("", _matchers.Select(m => m.ToString()))}";
 
     // Every child matcher must succeed on a continuous path
     public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
     {
+        remainder = path ?? throw new ArgumentNullException(nameof(path));
         binding = null;
-        remainder = path;
+
         foreach (var matcher in _matchers)
         {
             var ret = matcher.Match(remainder, out var currentRemainder, out var d);
@@ -124,22 +143,19 @@ public class AggregatedMatcher : Matcher
 /// <summary>
 /// <c>StaticMatcher</c> matches any literal.
 /// </summary>
-public class StaticMatcher : Matcher
+public class StaticMatcher(string value) : Matcher
 {
-    private readonly string _value;
-    public StaticMatcher(string value)
-    {
-        _value = value;
-    }
-
-    public override string ToString() => $"{_value}";
+    internal string Destination { get; } = value;
+    public override string ToString() => $"{Destination}";
 
     public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
     {
+        if (path == null) throw new ArgumentNullException(nameof(path));
+
         binding = null;
-        if (path.StartsWith(_value))
+        if (path.StartsWith(Destination, StringComparison.Ordinal))
         {
-            remainder = path.Remove(0, _value.Length);
+            remainder = path.Remove(0, Destination.Length);
             return true;
         }
 
@@ -149,74 +165,119 @@ public class StaticMatcher : Matcher
 }
 
 /// <summary>
-/// <c>BindingSplatMatcher</c> matches N segments separated by '/'. N=0 is a special case for matching anything (0 or more characters).
+/// <c>BindingNonGreedyMatcher</c> matches anything before we hit the terminator string or the path separator for the first time.
 /// </summary>
-public class BindingSplatMatcher : Matcher
+public class BindingNonGreedyMatcher(string dst, string? terminator = null) : Matcher
 {
-    private readonly string _bindingDestination;
-    private readonly int _n;
+    internal string Destination { get; } = dst;
+    internal string? Terminator { get; set; } = terminator;
 
-    public BindingSplatMatcher(string dst, int n = 0)
+    public override string ToString()
     {
-        _bindingDestination = dst;
-        _n = n;
+        if (Terminator == null)
+        {
+            return $"{'{'}{Destination}: before(\"{PathSeparator}\"){'}'}";
+        }
+        else
+        {
+            return $"{'{'}{Destination}: before(either(\"{PathSeparator}\", \"{Terminator}\")){'}'}";
+        }
     }
-
-    public override string ToString() => $"[{_bindingDestination} -> splat({(_n == 0 ? "anything" : _n.ToString())})]";
 
     public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
     {
-        // special case: if _n == 0 then match anything (0 or more characters)
-        if (_n == 0)
+        if (path == null) throw new ArgumentNullException(nameof(path));
+
+        var cutPos = path.IndexOf(PathSeparator, StringComparison.Ordinal);
+        if (Terminator != null)
         {
+            var cutPos2 = path.IndexOf(Terminator, StringComparison.Ordinal);
+            if (cutPos2 >= 0 && (cutPos < 0 || cutPos2 < cutPos))
+            {
+                cutPos = cutPos2;
+            }
+        }
+        
+        if (cutPos < 0)
+        {
+            // no terminator found, match the whole path
             binding = new Dictionary<string, string>
             {
-                [_bindingDestination] = path,
+                [Destination] = path,
             };
             remainder = "";
             return true;
         }
 
-        // match N segments
-        var c = path.Split('/', _n + 1);
-
-        // not getting N segments, return non-match
-        if (c.Length < _n)
-        {
-            remainder = path;
-            binding = null;
-            return false;
-        }
-
-        remainder = c.Length == _n ? "" : "/" + c[_n];
+        remainder = path[cutPos..];
         binding = new Dictionary<string, string>
         {
-            [_bindingDestination] = c[.._n].Join("/"),
+            [Destination] = path[..cutPos],
         };
         return true;
     }
 }
 
 /// <summary>
-/// <c>BindingRegexMatcher</c> matches anything that matches the regular expression. It does not stop at '/'.
+/// <c>BindingSplatMatcher</c> matches N segments separated by the path separator. N=0 is a special case for matching anything (0 or more characters).
 /// </summary>
-public class BindingRegexMatcher : Matcher
+public class BindingSplatMatcher(string destination, int repeat = 0) : Matcher
 {
-    private readonly string _bindingDestination;
-    private readonly Regex _regex;
+    internal string Destination { get; } = destination;
+    internal int Repeat { get; } = repeat;
 
-    public BindingRegexMatcher(string dst, string regex)
-    {
-        _bindingDestination = dst;
-        _regex = new Regex(regex, RegexOptions.Compiled | RegexOptions.Singleline);
-    }
-
-    public override string ToString() => $"[{_bindingDestination} -> {_regex.ToString() ?? "*any*"}]";
+    public override string ToString() => $"{'{'}{Destination}: splat({(Repeat == 0 ? "anything" : Repeat)}){'}'}";
 
     public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
     {
+        if (path == null) throw new ArgumentNullException(nameof(path));
+
+        // special case: if _n == 0 then match anything (0 or more characters)
+        if (Repeat == 0)
+        {
+            binding = new Dictionary<string, string>
+            {
+                [Destination] = path,
+            };
+            remainder = "";
+            return true;
+        }
+
+        // match N segments
+        var c = path.Split('/', Repeat + 1);
+
+        // not getting N segments, return non-match
+        if (c.Length < Repeat)
+        {
+            remainder = path;
+            binding = null;
+            return false;
+        }
+
+        remainder = c.Length == Repeat ? "" : "/" + c[Repeat];
+        binding = new Dictionary<string, string>
+        {
+            [Destination] = c[..Repeat].Join("/"),
+        };
+        return true;
+    }
+}
+
+/// <summary>
+/// <c>BindingRegexMatcher</c> matches anything that matches the regular expression. It need not stop at the path separator, if the regular expression permits.
+/// </summary>
+public class BindingRegexMatcher(string dst, string re) : Matcher
+{
+    internal Regex Regex { get; } = new(re, RegexOptions.Compiled | RegexOptions.Singleline);
+
+    public override string ToString() => $"{'{'}{dst}: {Regex.ToString() ?? "*any*"}{'}'}";
+
+    public override bool Match(string path, out string remainder, out Dictionary<string, string>? binding)
+    {
+        if (path == null) throw new ArgumentNullException(nameof(path));
+
         // regex set: match the first regex
-        var m = _regex.Match(path);
+        var m = Regex.Match(path);
         if (!m.Success)
         {
             remainder = path;
@@ -226,7 +287,7 @@ public class BindingRegexMatcher : Matcher
 
         binding = new Dictionary<string, string>
         {
-            [_bindingDestination] = m.Value,
+            [dst] = m.Value,
         };
         remainder = path.Remove(0, m.Value.Length);
         return true;

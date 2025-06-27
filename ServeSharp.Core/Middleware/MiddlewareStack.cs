@@ -14,13 +14,15 @@ public class MiddlewareStack<T>
 
     public MiddlewareStack(params HandleFunc<T>[] handles)
     {
-        _handles.AddRange(handles);
+        Add(handles);
     }
 
     public void Add(params HandleFunc<T>[] handles) => _handles.AddRange(handles);
 
     public async Middleware Handle(T context, StackingAwaiter next)
     {
+        if (next == null) throw new ArgumentNullException(nameof(next));
+
         foreach (var h in _handles)
         {
             try
