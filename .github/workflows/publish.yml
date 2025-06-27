@@ -1,0 +1,45 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - trunk
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      packages: write
+      contents: write
+    strategy:
+      matrix:
+        dotnet-version: [ '8.x' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # parse version
+      - name: Parse Version (Tagged)
+        if: github.ref_type == 'tag'
+        run: echo "${${{github.ref_name}}#?}" | tee -a "$GITHUB_ENV"
+
+      # - name: Setup dotnet ${{ matrix.dotnet-version }}
+      #   uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: ${{ matrix.dotnet-version }}
+      #     cache: true
+      #     cache-dependency-path: '*/packages.lock.json'
+
+      # - name: Restore
+      #   run: dotnet restore --locked-mode
+
+      # - name: Build
+      #   run: dotnet build --no-restore --configuration Release
+
+      # - name: Unit Tests
+      #   run: dotnet test --no-build --configuration Release
+
+      # - name: Publish
+      #   run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json
