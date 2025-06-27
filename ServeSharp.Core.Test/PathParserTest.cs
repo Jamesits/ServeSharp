@@ -100,6 +100,47 @@ internal class PathParserTest
     }
 
     [Test]
+    public void TestSegmentOneRequired()
+    {
+        const string src = @"/path1/{aaa}";
+        var ret = _parser!.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"aaa", "aaa"},
+        });
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+    }
+
+    [Test]
+    public void TestSegmentOneOptional()
+    {
+        const string src = @"/path1/{aaa?}";
+        var ret = _parser!.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"aaa", "aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/", "", new Dictionary<string, string>
+        {
+            {"aaa", ""},
+        });
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb");
+        AssertNonMatchPath(ret.Result, "/path1/aaa/bbb/");
+    }
+
+    [Test]
     public void TestSegmentMultiLiteralInEndingSegment()
     {
         const string src = @"/path1/aaa-{year}-{month}-{day}.html";
@@ -205,9 +246,34 @@ internal class PathParserTest
     }
 
     [Test]
-    public void TestSplatAnything()
+    public void TestSplatAnythingRequired()
     {
         const string src = @"/path1/{anything: splat}";
+        var ret = _parser!.Parse(src);
+        ret.ThrowIfError();
+        Console.WriteLine(src);
+        Console.WriteLine(ret.Result);
+
+        AssertNonMatchPath(ret.Result, "/path1");
+        AssertNonMatchPath(ret.Result, "/path1/");
+        AssertMatchPath(ret.Result, "/path1/aaa", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb"},
+        });
+        AssertMatchPath(ret.Result, "/path1/aaa/bbb/", "", new Dictionary<string, string>
+        {
+            {"anything", "aaa/bbb/"},
+        });
+    }
+
+    [Test]
+    public void TestSplatAnythingOptional()
+    {
+        const string src = @"/path1/{anything?: splat}";
         var ret = _parser!.Parse(src);
         ret.ThrowIfError();
         Console.WriteLine(src);

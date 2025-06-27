@@ -64,12 +64,12 @@ public sealed class Parser
     public static Matcher Literal(List<Token<RouteToken>> pcs) => new StaticMatcher(string.Concat(pcs.Select(x => x.StringWithoutQuotes)));
 
     // "{name}" - matches everything before next literal
-    [Production("binding_segment : BIND_START [d] BIND_DST BIND_END [d]")]
-    public static Matcher BindingSegment(Token<RouteToken> bindDst) => new BindingNonGreedyMatcher(bindDst.StringWithoutQuotes);
+    [Production("binding_segment : BIND_START [d] BIND_DST BIND_OPT? BIND_END [d]")]
+    public static Matcher BindingSegment(Token<RouteToken> bindDst, Token<RouteToken> bindOpt) => new BindingNonGreedyMatcher(bindDst.StringWithoutQuotes, bindOpt.IsEmpty);
 
     // "{name : splat}" - matches 0 or more characters (use at the end only)
-    [Production("binding_splat_any : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] BIND_END [d]")]
-    public static Matcher BindingSplatCount(Token<RouteToken> bindDst) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 0);
+    [Production("binding_splat_any : BIND_START [d] BIND_DST BIND_OPT? BIND_SEP [d] BIND_SPLAT [d] BIND_END [d]")]
+    public static Matcher BindingSplatAny(Token<RouteToken> bindDst, Token<RouteToken> bindOpt) => new BindingSplatMatcher(bindDst.StringWithoutQuotes, 0, bindOpt.IsEmpty);
 
     // "{name : splat(N)}" - matches N segments separated by '/'
     [Production("binding_splat : BIND_START [d] BIND_DST BIND_SEP [d] BIND_SPLAT [d] BRACKET_L [d] BIND_SPLAT_COUNT BRACKET_R [d] BIND_END [d]")]

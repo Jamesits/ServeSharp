@@ -17,7 +17,9 @@ Supported formats:
 - `/path/to/resource`: exact match
 - `/user/{userid}/posts/{postid}`, : parameter will match any string until the next `/` or the end of the path
 - `/posts/{year}-{month}-{day}/`: parameter will match any string that is not a `/` in a non-greedy way (use with caution!)
-- `/dir/{param: splat}`: parameter will match 0 or more characters all the way to the end of the string
+- `/dir/{param?}`: allow 0 characters to be matched
+- `/dir/{param: splat}`: parameter will match 1 or more characters all the way to the end of the string
+- `/dir/{param?: splat}`: same as above but allow 0 character to be matched
 - `/dir/{param: splat(N)}`: parameter will match exactly N segments separated by `/`
 - `/dir/{param: /regex/}`: parameter will match the regex pattern (including any `/` if the regex permits)
 

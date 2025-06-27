@@ -22,6 +22,10 @@ public enum RouteToken
     [Pop]
     BIND_END,
 
+    [Sugar("?")]
+    [Mode("bind")]
+    BIND_OPT,
+
     [Sugar(":")]
     [Mode("bind")]
     BIND_SEP,
@@ -45,6 +49,10 @@ public enum RouteToken
     [Int]
     [Mode("bind")]
     BIND_SPLAT_COUNT,
+
+    [Sugar(",")]
+    [Mode("bind")]
+    BIND_ARG_SEP,
 
     [Sugar(")")]
     [Mode("bind")]

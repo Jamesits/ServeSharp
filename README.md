@@ -183,6 +183,7 @@ Supported formats:
 
 - `/path/to/resource`: exact match
 - `/path/{param}`: parameter will match any string until the next `/` or the end of the path
+- `/path/{param?}`: optional match
 - `/path/{param1}-{param2}-{param3}`: parameters will match non-greedy segments separated by your custom separator (e.g. `-` in this case)
 - `/path/{param: splat}`: parameter will match any string until the end of the path
 - `/path/{param: splat(N)}`: parameter will match N segments separated by `/`

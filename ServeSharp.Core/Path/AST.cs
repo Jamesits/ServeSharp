@@ -167,20 +167,21 @@ public class StaticMatcher(string value) : Matcher
 /// <summary>
 /// <c>BindingNonGreedyMatcher</c> matches anything before we hit the terminator string or the path separator for the first time.
 /// </summary>
-public class BindingNonGreedyMatcher(string dst, string? terminator = null) : Matcher
+public class BindingNonGreedyMatcher(string dst, bool atLeastOne = false, string? terminator = null) : Matcher
 {
     internal string Destination { get; } = dst;
     internal string? Terminator { get; set; } = terminator;
+    internal bool AtLeastOne { get; } = atLeastOne;
 
     public override string ToString()
     {
         if (Terminator == null)
         {
-            return $"{'{'}{Destination}: before(\"{PathSeparator}\"){'}'}";
+            return $"{'{'}{Destination}: {(AtLeastOne ? "" : "optional, ")}before(\"{PathSeparator}\"){'}'}";
         }
         else
         {
-            return $"{'{'}{Destination}: before(either(\"{PathSeparator}\", \"{Terminator}\")){'}'}";
+            return $"{'{'}{Destination}: {(AtLeastOne ? "" : "optional, ")}before(either(\"{PathSeparator}\", \"{Terminator}\")){'}'}";
         }
     }
 
@@ -197,7 +198,15 @@ public class BindingNonGreedyMatcher(string dst, string? terminator = null) : Ma
                 cutPos = cutPos2;
             }
         }
-        
+
+        if (AtLeastOne && (path.Length == 0 || cutPos == 0 ))
+        {
+            // no match, but at least one character is required
+            remainder = path;
+            binding = null;
+            return false;
+        }
+
         if (cutPos < 0)
         {
             // no terminator found, match the whole path
@@ -221,10 +230,11 @@ public class BindingNonGreedyMatcher(string dst, string? terminator = null) : Ma
 /// <summary>
 /// <c>BindingSplatMatcher</c> matches N segments separated by the path separator. N=0 is a special case for matching anything (0 or more characters).
 /// </summary>
-public class BindingSplatMatcher(string destination, int repeat = 0) : Matcher
+public class BindingSplatMatcher(string destination, int repeat = 0, bool atLeastOne = false) : Matcher
 {
     internal string Destination { get; } = destination;
     internal int Repeat { get; } = repeat;
+    internal bool AtLeastOne { get; } = atLeastOne;
 
     public override string ToString() => $"{'{'}{Destination}: splat({(Repeat == 0 ? "anything" : Repeat)}){'}'}";
 
@@ -235,6 +245,13 @@ public class BindingSplatMatcher(string destination, int repeat = 0) : Matcher
         // special case: if _n == 0 then match anything (0 or more characters)
         if (Repeat == 0)
         {
+            if (AtLeastOne && path.Length == 0)
+            {
+                remainder = path;
+                binding = null;
+                return false;
+            }
+
             binding = new Dictionary<string, string>
             {
                 [Destination] = path,
