@@ -40,7 +40,7 @@ There are a lot HTTP request/response class implementations in the C#/.NET ecosy
 ```csharp
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
-# import the implementation corresponding to your HTTP request/response type
+// import the implementation corresponding to your HTTP request/response type
 using ServeSharp.NetHttp;
 
 namespace MyServer;
