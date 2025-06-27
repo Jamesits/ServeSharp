@@ -2,10 +2,11 @@ name: Publish
 
 on:
   push:
-    branches:
-      - trunk
     tags:
       - "v*"
+
+env:
+  VERSION: "0.0.0"
 
 jobs:
   publish:
@@ -23,23 +24,31 @@ jobs:
       # parse version
       - name: Parse Version (Tagged)
         if: github.ref_type == 'tag'
-        run: echo "${${{github.ref_name}}#?}" | tee -a "$GITHUB_ENV"
+        run: echo "VERSION=${${{ github.ref_name }}#?}" | tee -a "$GITHUB_ENV"
 
-      # - name: Setup dotnet ${{ matrix.dotnet-version }}
-      #   uses: actions/setup-dotnet@v4
-      #   with:
-      #     dotnet-version: ${{ matrix.dotnet-version }}
-      #     cache: true
-      #     cache-dependency-path: '*/packages.lock.json'
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+          cache: true
+          cache-dependency-path: '*/packages.lock.json'
 
-      # - name: Restore
-      #   run: dotnet restore --locked-mode
+      - name: Restore
+        run: dotnet restore --locked-mode
 
-      # - name: Build
-      #   run: dotnet build --no-restore --configuration Release
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -p:VersionPrefix=${{VERSION}}
 
-      # - name: Unit Tests
-      #   run: dotnet test --no-build --configuration Release
+      - name: Unit Tests
+        run: dotnet test --no-build --configuration Release
 
-      # - name: Publish
-      #   run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            "**/*.nupkg"
+
+      - name: Publish
+        if: github.ref_type == 'tag'
+        run: dotnet nuget push "**/*.nupkg" --source https://api.nuget.org/v3/index.json

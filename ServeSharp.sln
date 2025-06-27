@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{25D9EF46-B6B3-47AD-9959-23E59C850283}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish.yml = .github\workflows\publish.yml
 		.github\workflows\test-netcore.yml = .github\workflows\test-netcore.yml
 	EndProjectSection
 EndProject
