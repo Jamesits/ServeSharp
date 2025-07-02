@@ -11,18 +11,38 @@ public class Context : IDisposable
     private readonly Dictionary<string, object> _dict = new Dictionary<string, object>();
     private readonly DictionaryAdapterFactory _factory = new DictionaryAdapterFactory();
 
+    public object this[string key]
+    {
+        get => Get(key);
+        set => Set(key, value);
+    }
+
     public void Set(string key, object thing)
     {
         _dict.Add(key, thing);
     }
 
-    public object? Get(string key)
+    public object Get(string key)
     {
-        var ok = _dict.TryGetValue(key, out var ret);
-        return !ok ? null : ret;
+        return _dict[key];
     }
 
-    public T Get<T>()
+    public object GetOrDefault(string key, object defaultValue)
+    {
+        return _dict.GetValueOrDefault(key, defaultValue);
+    }
+
+    public bool TryGetValue(string key, out object value)
+    {
+        return _dict.TryGetValue(key, out value);
+    }
+
+    public void Remove(string key)
+    {
+        _dict.Remove(key);
+    }
+
+    public T As<T>()
     {
         return _factory.GetAdapter<T>(_dict);
     }

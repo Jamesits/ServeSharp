@@ -31,7 +31,7 @@ internal class RouterTest
 
         _router.Get("/root", (context, _) =>
         {
-            Console.WriteLine("Get root");
+            Console.WriteLine("As root");
             return Middleware.CompletedTask;
         });
         _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", (context, _) =>
