@@ -15,11 +15,36 @@ public class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompletion, 
     // Prevents invocation after disposal
     private bool _completed;
     // Keeps track of any deferred code blocks
-    private readonly ConcurrentStack<Action> _completions = new ConcurrentStack<Action>();
+    private readonly ConcurrentStack<Action> _completions = new();
     // Queued exception to be raised on `await`
     private AggregateException? _exception;
+    private bool _currentStackHasCallback;
+
+    // Signal that we are entering a new middleware func
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal void StackPush()
+    {
+        lock (this)
+        {
+            _currentStackHasCallback = false;
+        }
+    }
+
+    // Signal that we have exited a middleware func (either by returning or at `await next`).
+    // Returns true if it returned from an `await next`
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool StackPop()
+    {
+        lock (this)
+        {
+            var ret = _currentStackHasCallback;
+            _currentStackHasCallback = false;
+            return ret;
+        }
+    }
 
     // Queue an exception to be raised at next await
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void QueueException(Exception? exception)
     {
         lock (this)
@@ -39,6 +64,8 @@ public class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompletion, 
             {
                 throw new InvalidOperationException("Use of StackingAwaiter after disposal");
             }
+
+            _currentStackHasCallback = true;
             _completions.Push(action);
         }
     }

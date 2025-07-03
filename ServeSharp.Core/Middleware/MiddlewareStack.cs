@@ -27,7 +27,13 @@ public class MiddlewareStack<T>
         {
             try
             {
+                next.StackPush();
                 await h(context, next);
+                if (!next.StackPop())
+                {
+                    // Detect early return from the middleware stack and stop processing
+                    break;
+                }
             }
 #pragma warning disable CA1031
             catch (Exception ex)

@@ -26,6 +26,24 @@ public class MiddlewareStackTest
             [101, 201, 301, 209, 109]);
     }
 
+    [Test]
+    public async Task TestEarlyReturnMiddlewareStack()
+    {
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainTerminatingMiddlewareAsync,
+                PlainChainedMiddleware2
+            ),
+            [101, 301, 109]);
+
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+                PlainChainedMiddleware1,
+                PlainTerminatingMiddlewareSync,
+                PlainChainedMiddleware2
+            ),
+            [101, 301, 109]);
+    }
+
     // If exception is thrown before `await next` call, further middleware call would be stopped immediately; exception should pop up to every executed middleware's bottom part.
     [Test]
     public Task TestThrowingBeforeMiddlewareStack()
