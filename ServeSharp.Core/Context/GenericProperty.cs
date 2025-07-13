@@ -1,4 +1,6 @@
-﻿namespace ServeSharp.Core.Context;
+﻿using System;
+
+namespace ServeSharp.Core.Context;
 
 public class GenericProperty<T>
 {

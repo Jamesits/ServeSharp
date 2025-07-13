@@ -58,7 +58,7 @@ public class Server : IDisposable
             using var context = new Context();
             context.Http.Request = httpRequest;
             context.Http.Response = new HttpResponseMessage();
-            await Router.Handle(context);
+            await Router.ServeHttp(context);
 
             await conn.SendAsync(await context.Http.Response.ToByteArray().ConfigureAwait(false), SocketFlags.None).ConfigureAwait(false);
             conn.Close();

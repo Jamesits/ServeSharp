@@ -1,25 +1,17 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Net.Http;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp;
 
-public class Route
+public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers)
 {
     public string Name { get; set; } = "UNNAMED";
     public string OriginalRouteDefinition { get; internal set; } = "";
-    public Matcher Matcher { get; }
-    public HttpMethod? Method { get; }
-    private readonly HandleFunc<Context>[] _handlers;
-
-    public Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers)
-    {
-        Method = method;
-        Matcher = matcher;
-        _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
-    }
+    public Matcher Matcher { get; } = matcher;
+    public HttpMethod? Method { get; } = method;
+    private readonly HandleFunc<Context>[] _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
 
     public override string ToString() => $"{Name} {Method?.ToString() ?? "ANY"} Handler[{_handlers.Length}] {OriginalRouteDefinition}";
 
@@ -47,5 +39,5 @@ public class Route
         return ret;
     }
 
-    public MiddlewareStack<Context> Stack => new MiddlewareStack<Context>(_handlers);
+    public MiddlewareStack<Context> Stack => new (_handlers);
 }

@@ -7,14 +7,15 @@ using System.Net.Http;
 using System.Text;
 using ServeSharp.Core.Path;
 using sly.parser;
+using ServeSharp.Core;
 
 namespace ServeSharp.NetHttp;
 
-public class Router : IPathGroup<Context, Route>
+public class Router : IPathGroup<Context, Route>, IServeMux<Context>
 {
-    private readonly List<Route> _routes = new List<Route>();
+    private readonly List<Route> _routes = [];
     private readonly Parser<RouteToken, Matcher> _parser = Parser.New();
-    private readonly List<HandleFunc<Context>> _middlewares = new List<HandleFunc<Context>>();
+    private readonly List<HandleFunc<Context>> _middlewares = [];
 
     public bool AutoHead { get; set; } = true;
     public HandleFunc<Context> NotFound { private get; set; } = DefaultNotFoundHandler;
@@ -23,13 +24,12 @@ public class Router : IPathGroup<Context, Route>
 
     public IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
 
-    internal Route Route(Route route)
+    public void Handle(params Route[] routes)
     {
-        _routes.Add(route);
-        return route;
+        _routes.AddRange(routes);
     }
 
-    public Route Route(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
+    public Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
     {
         var pr = _parser.Parse(path);
         pr.ThrowIfError();
@@ -39,10 +39,11 @@ public class Router : IPathGroup<Context, Route>
             OriginalRouteDefinition = path,
         };
 
-        return Route(ret);
+        Handle(ret);
+        return ret;
     }
 
-    public async Middleware Handle(Context context)
+    public async Middleware ServeHttp(Context context)
     {
         var stack = _routes.FirstOrDefault(route => route.Match(context))?.Stack ?? NotFoundStack;
 

@@ -1,5 +1,5 @@
-﻿using ServeSharp.Core.Middleware;
-using ServeSharp.Core.Path;
+﻿using ServeSharp.Core;
+using ServeSharp.Core.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,5 +33,5 @@ public class RouteGroup : IPathGroup<Context, Route>
 
     public IPathGroup<Context, Route> Group(string path) => new RouteGroup(_parent, _path + path);
 
-    public Route Route(HttpMethod? method, string path, params HandleFunc<Context>[] handlers) => _parent.Route(method, _path + path, _middlewares.Concat(handlers).ToArray());
+    public Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers) => _parent.Handle(method, _path + path, _middlewares.Concat(handlers).ToArray());
 }

@@ -10,7 +10,7 @@ public interface ICustomContext
 
 public static class CustomContextMiddleware
 {
-    public static ICustomContext CustomContext(this Context context) => context.As<ICustomContext>();
+    public static ICustomContext CustomContext(this Context context) => context!.GetAdapter<ICustomContext>();
 
     public static async Middleware SetContext(Context context, IAwaitable next)
     {
@@ -41,7 +41,7 @@ internal class MiddlewareTest
         _router.Use(CustomContextMiddleware.AssertContext);
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        _router.Get("/", async (context, _) => Console.WriteLine("As root"));
+        _router.Get("/", async (context, _) => Console.WriteLine("GetAdapter root"));
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         Console.WriteLine(_router);
@@ -53,6 +53,6 @@ internal class MiddlewareTest
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
     }
 }

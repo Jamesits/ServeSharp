@@ -28,16 +28,10 @@ internal class RouterMiddlewareTest
     [Test]
     public async Task TestCorsMiddlewareGet1()
     {
-        var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/root")
-        {
-            Headers =
-            {
-                Accept = { }
-            }
-        };
+        var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/root");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 #pragma warning disable CA2007
@@ -58,7 +52,7 @@ internal class RouterMiddlewareTest
         };
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
     }
@@ -75,7 +69,7 @@ internal class RouterMiddlewareTest
         };
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 #pragma warning disable CA2007

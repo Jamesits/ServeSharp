@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using ServeSharp.Core;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 using sly.parser;
@@ -30,7 +31,7 @@ public class Router : IPathGroup<Context, Route>
         return route;
     }
 
-    public Route Route(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
+    public Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
     {
         var pr = _parser.Parse(path);
         pr.ThrowIfError();

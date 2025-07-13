@@ -12,5 +12,5 @@ public interface IHttp
 
 public class Context : ServeSharp.Core.Context.Context
 {
-    public IHttp Http => As<IHttp>();
+    public IHttp Http => GetAdapter<IHttp>();
 }

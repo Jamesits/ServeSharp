@@ -6,7 +6,9 @@ namespace ServeSharp.Core.Middleware;
 
 public delegate Middleware HandleFunc<in T>(T context, IAwaitable next);
 
+#pragma warning disable CA1711
 public class MiddlewareStack<T>
+#pragma warning restore CA1711
 {
     private readonly List<HandleFunc<T>> _handles = [];
 
@@ -48,3 +50,4 @@ public class MiddlewareStack<T>
         }
     }
 }
+  

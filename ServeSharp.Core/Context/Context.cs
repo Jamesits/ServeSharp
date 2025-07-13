@@ -1,81 +1,36 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using Castle.Components.DictionaryAdapter;
 
 namespace ServeSharp.Core.Context;
 
-public static class TypeExtensions
-{
-    public static object? GetDefault(this Type type)
-    {
-        if (type.GetTypeInfo().IsValueType)
-        {
-            return Activator.CreateInstance(type);
-        }
-
-        return null;
-    }
-}
-
-public class Context : IDisposable
+public class Context : Dictionary<string, object>, IDisposable, IContext
 {
     private bool _disposed;
-    private readonly Dictionary<string, object> _dict = new();
     private readonly DictionaryAdapterFactory _factory = new();
 
-    public object this[string key]
-    {
-        get => Get(key);
-        set => BlindSet(key, value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void BlindSet(string key, object thing)
-    {
-        _dict.Add(key, thing);
-    }
-
-    public object? Set(string key, object thing)
+    public object? Swap(string key, object thing)
     {
         var originalObject = GetOrDefault(key, null);
-        BlindSet(key, thing);
+        Add(key, thing);
         return originalObject;
     }
 
-    public T? Set<T>(string key, T thing) where T : class
+    public T? Swap<T>(string key, T thing) where T : class
     {
-        var originalObject = GetOrDefault(key, null);
-        BlindSet(key, thing);
+        var originalObject = GetOrDefault(key, default(T));
+        Add(key, thing);
         return originalObject as T;
     }
 
-    public object Get(string key)
-    {
-        return _dict[key];
-    }
+    public object Get(string key) => this[key];
 
-    public T Get<T>(string key) where T : class
-    {
-        return Get(key) as T ?? throw new NullReferenceException();
-    }
+    public T Get<T>(string key) where T : class => Get(key) as T ?? throw new KeyNotFoundException();
 
-    public object? GetOrDefault(string key, object? defaultValue)
-    {
-        return _dict!.GetValueOrDefault(key, defaultValue);
-    }
+    public object? GetOrDefault(string key, object? defaultValue) => this!.GetValueOrDefault(key, defaultValue);
 
-    public T? GetOrDefault<T>(string key, T? defaultValue) where T : class
-    {
-        return GetOrDefault(key, (object?)defaultValue) as T;
-    }
-
-    public bool TryGetValue(string key, out object value)
-    {
-        return _dict.TryGetValue(key, out value);
-    }
+    public T? GetOrDefault<T>(string key, T? defaultValue) where T : class => GetOrDefault(key, (object?)defaultValue) as T;
 
     public bool TryGetValue<T>(string key, out T? value) where T : class
     {
@@ -90,15 +45,7 @@ public class Context : IDisposable
         return true;
     }
 
-    public void Remove(string key)
-    {
-        _dict.Remove(key);
-    }
-
-    public T As<T>()
-    {
-        return _factory.GetAdapter<T>(_dict);
-    }
+    public T GetAdapter<T>() => _factory.GetAdapter<T>(this);
 
     public void Dispose()
     {
@@ -115,7 +62,7 @@ public class Context : IDisposable
             // free managed resources
             if (disposing)
             {
-                foreach (var value in _dict.Values)
+                foreach (var value in Values)
                 {
                     if (value is IAsyncDisposable vad)
                     {

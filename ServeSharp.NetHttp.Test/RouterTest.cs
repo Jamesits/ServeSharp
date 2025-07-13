@@ -1,4 +1,5 @@
-﻿using ServeSharp.Core.Middleware;
+﻿#pragma warning disable CA1303
+using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;
@@ -12,15 +13,15 @@ internal class RouterTest
         _router = new Router();
 
         // recovery
-        _router.Use(recovery);
+        _router.Use(Recovery);
 
-        _router.Use(async (context, next) =>
+        _router.Use(async (_, next) =>
         {
             Console.WriteLine("Middleware 1 enter");
             await next;
             Console.WriteLine("Middleware 1 exit");
         });
-        _router.Use(async (context, next) =>
+        _router.Use(async (_, next) =>
         {
             Console.WriteLine("Middleware 2 enter");
             // throw new NotImplementedException();
@@ -29,17 +30,17 @@ internal class RouterTest
             Console.WriteLine("Middleware 2 exit");
         });
 
-        _router.Get("/root", (context, _) =>
+        _router.Get("/root", (_, _) =>
         {
-            Console.WriteLine("As root");
+            Console.WriteLine("GetAdapter root");
             return Middleware.CompletedTask;
         });
-        _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", (context, _) =>
+        _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", (_, _) =>
         {
             Console.WriteLine("Post complex route");
             return Middleware.CompletedTask;
         });
-        _router.Group("/group1").Any("/any", (context, _) =>
+        _router.Group("/group1").Any("/any", (_, _) =>
         {
             Console.WriteLine("Any");
             return Middleware.CompletedTask;
@@ -54,7 +55,7 @@ internal class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/root");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
     }
 
     [Test]
@@ -63,7 +64,7 @@ internal class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Post, "https://example.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
     }
 
     [Test]
@@ -72,10 +73,10 @@ internal class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Trace, "https://example.com/group1/any");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router!.ServeHttp(ctx);
     }
 
-    public static async Middleware recovery(Context context, IAwaitable next)
+    public static async Middleware Recovery(Context context, IAwaitable next)
     {
         Console.WriteLine("Recovery enter");
 
@@ -83,7 +84,9 @@ internal class RouterTest
         {
             await next;
         }
+#pragma warning disable CA1031
         catch (Exception ex)
+#pragma warning restore CA1031
         {
             Console.WriteLine($"Caught exception: {ex}");
         }

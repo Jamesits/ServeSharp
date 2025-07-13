@@ -10,7 +10,7 @@ namespace ServeSharp.Core.Middleware;
 /// StackingAwaiter, when awaited, folds all the code after the await line into a stack. When it is disposed, the deferred code are executed in reverse order.
 /// Deferred execution is synchronous. The `async` grammar is only used as a synthetic sugar.
 /// </summary>
-public class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompletion, IDisposable, IAsyncDisposable
+public sealed class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompletion, IDisposable, IAsyncDisposable
 {
     // Prevents invocation after disposal
     private bool _completed;
