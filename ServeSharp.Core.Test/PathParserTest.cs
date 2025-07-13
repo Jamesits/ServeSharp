@@ -1,4 +1,5 @@
-﻿using ServeSharp.Core.Path;
+﻿#pragma warning disable CA1303
+using ServeSharp.Core.Path;
 using sly.parser;
 
 namespace ServeSharp.Core.Test;

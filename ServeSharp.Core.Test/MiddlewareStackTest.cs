@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿#pragma warning disable CA1303
+using System.Collections.Concurrent;
 using ServeSharp.Core.Middleware;
 
 namespace ServeSharp.Core.Test;

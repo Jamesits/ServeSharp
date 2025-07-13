@@ -1,4 +1,5 @@
-﻿using ServeSharp.Core.Middleware;
+﻿#pragma warning disable CA1303
+using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 
 namespace ServeSharp.NetHttp.Test;

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ServeSharp.Core.Utils;
 
-public static class BinaryWriterExtension
+public static class BinaryWriterExtensions
 {
     public static void WriteString(this BinaryWriter b, string s)
     {

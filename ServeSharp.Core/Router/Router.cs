@@ -1,4 +1,5 @@
-﻿using ServeSharp.Core.Middleware;
+﻿#nullable enable
+using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 using sly.parser;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace ServeSharp.Core.Router;
 
 public abstract class Router<TContext, TRoute> : IPathGroup<TContext, TRoute>, IServeMux<TContext> where TRoute : IRoute<TContext>
 {
-    protected readonly List<TRoute> Routes = [];
-    protected readonly Parser<RouteToken, Matcher> Parser = Path.Parser.New();
-    protected readonly List<HandleFunc<TContext>> Middlewares = [];
+    protected List<TRoute> Routes { get; }= [];
+    protected Parser<RouteToken, Matcher> Parser { get; } = Path.Parser.New();
+    protected List<HandleFunc<TContext>> Middlewares { get; } = [];
 
     public bool AutoHead { get; set; } = true;
 #pragma warning disable CA1044

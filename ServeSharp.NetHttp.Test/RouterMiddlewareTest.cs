@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿#pragma warning disable CA1303
+using System.Net;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 
