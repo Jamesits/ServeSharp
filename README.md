@@ -18,7 +18,7 @@ There are a lot HTTP request/response class implementations in the C#/.NET ecosy
 | ------- | -------------- |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) |
 | [`System.Net`](https://learn.microsoft.com/en-us/dotnet/api/system.net) | [`ServeSharp.NetHttpListener`](/ServeSharp.NetHttpListener) |
-| [CefSharp](https://github.com/cefsharp/CefSharp) | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) |
+| [`CefSharp`](https://github.com/cefsharp/CefSharp) | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) |
 | [`Microsoft.AspNetCore.Http`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http) | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) |
 | [`HttpMachine.PCL`](https://github.com/1iveowl/HttpMachine.PCL) | [`ServeSharp.HttpMachine`](/ServeSharp.HttpMachine) |
 
@@ -63,7 +63,7 @@ private class MyServer {
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router.Handle(ctx);
+        await _router.ServeHttp(ctx);
         // process ctx.Response
     }
 
