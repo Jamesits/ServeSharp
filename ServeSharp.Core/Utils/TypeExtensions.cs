@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-namespace ServeSharp.Core.Context;
+namespace ServeSharp.Core.Utils;
 
 public static class TypeExtensions
 {

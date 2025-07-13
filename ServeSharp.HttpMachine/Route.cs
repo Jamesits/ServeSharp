@@ -23,11 +23,11 @@ public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Contex
         if (Method != null)
         {
             // test method
-            if (Method != new HttpMethod(context.Request.HttpMethod)) return false;
+            if (Method != new HttpMethod(context.Request.Method)) return false;
         }
 
         // test path
-        var ret = Matcher.Match(context.Request.Url.AbsolutePath, out _, out var bindings);
+        var ret = Matcher.Match(context.Request.Path, out _, out var bindings);
         context.UrlBindings = bindings;
         return ret;
     }

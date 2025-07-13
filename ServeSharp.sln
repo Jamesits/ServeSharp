@@ -39,6 +39,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttpListener"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttpListener.Example.Cli", "ServeSharp.NetHttpListener.Example.Cli\ServeSharp.NetHttpListener.Example.Cli.csproj", "{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.HttpMachine", "ServeSharp.HttpMachine\ServeSharp.HttpMachine.csproj", "{08A1B253-29C0-4910-A725-E8A690955E88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.HttpMachine.Example.Cli", "ServeSharp.HttpMachine.Example.Cli\ServeSharp.HttpMachine.Example.Cli.csproj", "{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +109,18 @@ Global
 		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
 		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{08A1B253-29C0-4910-A725-E8A690955E88}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{3196E7C7-A90D-4820-810C-4BF8CA3CB05C}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

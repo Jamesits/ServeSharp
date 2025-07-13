@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ServeSharp.Core.Context;
+namespace ServeSharp.Core.Utils;
 
 public class GenericProperty<T>
 {

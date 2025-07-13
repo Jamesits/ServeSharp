@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HttpMachine.PCL" Version="5.0.1" />
+    <PackageReference Include="IHttpMachine" Version="5.0.1" />
   </ItemGroup>
 
   <ItemGroup>

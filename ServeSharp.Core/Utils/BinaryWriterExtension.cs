@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace ServeSharp.NetHttp;
+namespace ServeSharp.Core.Utils;
 
 public static class BinaryWriterExtension
 {

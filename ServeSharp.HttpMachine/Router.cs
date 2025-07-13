@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using ServeSharp.Core;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
@@ -37,12 +35,5 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
     {
         Console.WriteLine("404 NOT FOUND");
         return Middleware.CompletedTask;
-    }
-
-    public async Task ServeHttp(HttpListenerContext httpListenerContext)
-    {
-        using var ctx = new Context();
-        ctx.Http.HttpListenerContext = httpListenerContext;
-        await ServeHttp(ctx);
     }
 }
