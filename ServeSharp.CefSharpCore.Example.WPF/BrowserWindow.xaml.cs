@@ -49,11 +49,11 @@ public partial class BrowserWindow : Window, IDisposable
 
         InitializeComponent();
 
-        var browserSettings = new BrowserSettings
+        _browserSettings = new BrowserSettings
         {
             WindowlessFrameRate = 60,
         };
-        Browser.BrowserSettings = browserSettings;
+        Browser.BrowserSettings = _browserSettings;
     }
 
     protected virtual void Dispose(bool disposing)
