@@ -13,9 +13,9 @@ namespace ServeSharp.NetHttp;
 public class Server : IDisposable
 {
     private bool _disposed;
-    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+    private readonly CancellationTokenSource _cts = new();
 
-    public Router Router { get; } = new Router();
+    public Router Router { get; } = new();
 
     public async Task ListenAndServe()
     {
