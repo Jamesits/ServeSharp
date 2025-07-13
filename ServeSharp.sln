@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.Core", "ServeSha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.Core.Test", "ServeSharp.Core.Test\ServeSharp.Core.Test.csproj", "{5CC5DF3A-2C16-4393-A476-B3F7F980239A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttp", "ServeSharp.NetHttp\ServeSharp.NetHttp.csproj", "{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.NetHttp", "ServeSharp.NetHttp\ServeSharp.NetHttp.csproj", "{36E92079-C2B2-4BE3-A7C9-ECE26C4CD4F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttp.Test", "ServeSharp.NetHttp.Test\ServeSharp.NetHttp.Test.csproj", "{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.NetHttp.Test", "ServeSharp.NetHttp.Test\ServeSharp.NetHttp.Test.csproj", "{0ED2E86A-EE3E-45F2-82CD-9E85DBA50733}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
@@ -27,13 +27,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\test-netcore.yml = .github\workflows\test-netcore.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore", "ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj", "{ADB2F7B9-1580-442E-B580-3997574FA8DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.CefSharpCore", "ServeSharp.CefSharpCore\ServeSharp.CefSharpCore.csproj", "{ADB2F7B9-1580-442E-B580-3997574FA8DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.CefSharpCore.Example.WPF", "ServeSharp.CefSharpCore.Example.WPF\ServeSharp.CefSharpCore.Example.WPF.csproj", "{7BBA9C22-19D8-469E-8C00-4755258E1084}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.CefSharpCore.Example.WPF", "ServeSharp.CefSharpCore.Example.WPF\ServeSharp.CefSharpCore.Example.WPF.csproj", "{7BBA9C22-19D8-469E-8C00-4755258E1084}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.AspNetCore", "ServeSharp.AspNetCore\ServeSharp.AspNetCore.csproj", "{1304FA49-C661-4200-9C63-DA86B043BF0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.AspNetCore", "ServeSharp.AspNetCore\ServeSharp.AspNetCore.csproj", "{1304FA49-C661-4200-9C63-DA86B043BF0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.AspNetCore.Example.Cli", "ServeSharp.AspNetCore.Example.Cli\ServeSharp.AspNetCore.Example.Cli.csproj", "{C680F0BF-CAFF-4A55-8CA6-1EB4B74443A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServeSharp.AspNetCore.Example.Cli", "ServeSharp.AspNetCore.Example.Cli\ServeSharp.AspNetCore.Example.Cli.csproj", "{C680F0BF-CAFF-4A55-8CA6-1EB4B74443A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttpListener", "ServeSharp.NetHttpListener\ServeSharp.NetHttpListener.csproj", "{DA21908E-44A7-4A7B-988C-025352391E90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServeSharp.NetHttpListener.Example.Cli", "ServeSharp.NetHttpListener.Example.Cli\ServeSharp.NetHttpListener.Example.Cli.csproj", "{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +93,18 @@ Global
 		{C680F0BF-CAFF-4A55-8CA6-1EB4B74443A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C680F0BF-CAFF-4A55-8CA6-1EB4B74443A9}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
 		{C680F0BF-CAFF-4A55-8CA6-1EB4B74443A9}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{DA21908E-44A7-4A7B-988C-025352391E90}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.ReleaseLinux|Any CPU.ActiveCfg = Release|Any CPU
+		{5ECE1F0C-5B3B-4CBE-9A60-F30120DEB385}.ReleaseLinux|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

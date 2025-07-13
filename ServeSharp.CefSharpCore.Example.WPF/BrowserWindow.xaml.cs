@@ -1,9 +1,6 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Windows;
 using CefSharp;
-using CefSharp.DevTools.Network;
 using CefSharp.Wpf;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
@@ -15,18 +12,17 @@ namespace ServeSharp.CefSharpCore.Example.WPF;
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 #pragma warning disable CA1515
-public partial class BrowserWindow : Window, IDisposable
+public partial class BrowserWindow : IDisposable
 #pragma warning restore CA1515
 {
     private bool _disposed;
-    private readonly Server _server;
     private readonly CefSettings _cefSettings;
     private readonly BrowserSettings _browserSettings;
 
     public BrowserWindow()
     {
-        _server = new Server();
-        _server.Router.Get("/", (context, _) =>
+        var router = new Router();
+        router.Get("/", (context, _) =>
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -43,7 +39,7 @@ public partial class BrowserWindow : Window, IDisposable
         _cefSettings.RegisterScheme(new CefCustomScheme
         {
             SchemeName = "res",
-            SchemeHandlerFactory = _server,
+            SchemeHandlerFactory = router,
         });
         Cef.Initialize(_cefSettings);
 
@@ -64,7 +60,6 @@ public partial class BrowserWindow : Window, IDisposable
             Cef.Shutdown();
             _browserSettings.Dispose();
             _cefSettings.Dispose();
-            _server?.Dispose();
         }
 
         _disposed = true;

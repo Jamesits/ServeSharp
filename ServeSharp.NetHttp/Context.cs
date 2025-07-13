@@ -1,6 +1,4 @@
-﻿#nullable enable
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("ServeSharp.NetHttp.Test")]
@@ -11,15 +9,21 @@ public interface IHttp
     public HttpRequestMessage? Request { get; set; }
 
     public HttpResponseMessage? Response { get; set; }
-
-    public Dictionary<string, string>? UrlBindings { get; internal set; }
 }
 
 public class Context : ServeSharp.Core.Context.Context
 {
     public IHttp Http => GetAdapter<IHttp>();
 
-    public HttpRequestMessage? Request => Http.Request;
-    public HttpResponseMessage? Response => Http.Response;
-    public Dictionary<string, string>? UrlBindings => Http.UrlBindings;
+    public HttpRequestMessage? Request
+    {
+        get => Http.Request;
+        set => Http.Request = value;
+    }
+
+    public HttpResponseMessage? Response
+    {
+        get => Http.Response;
+        set => Http.Response = value;
+    }
 }

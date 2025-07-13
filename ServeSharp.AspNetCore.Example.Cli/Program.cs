@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Http;
 using ServeSharp.AspNetCore;
 using ServeSharp.Core.Path;
 
-using var server = new Server();
-server.Router.Get("/", async (context, _) =>
+var router = new Router();
+router.Get("/", async (context, _) =>
 {
     ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -13,9 +13,13 @@ server.Router.Get("/", async (context, _) =>
     await context.Http.HttpContext.Response.WriteAsync("<h1>It works!</h1>").ConfigureAwait(false);
 });
 
-
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-7.0#wildcard-and-catch-all-routes
-app.Map("/{*_}", server.Serve);
-app.Run();
+app.Map("/{*_}", router.ServeHttp);
+
+Console.CancelKeyPress += async (_, _) =>
+{
+    await app.StopAsync();
+};
+await app.RunAsync();

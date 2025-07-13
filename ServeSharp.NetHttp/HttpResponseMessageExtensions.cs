@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServeSharp.NetHttp;
 
-public static class HttpResponseMessageExtension
+public static class HttpResponseMessageExtensions
 {
     public static async Task<byte[]> ToByteArray(this HttpResponseMessage response)
     {

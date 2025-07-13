@@ -17,8 +17,9 @@ There are a lot HTTP request/response class implementations in the C#/.NET ecosy
 | Package | Implementation |
 | ------- | -------------- |
 | [`System.Net.Http`](https://learn.microsoft.com/en-us/dotnet/api/system.net.http) | [`ServeSharp.NetHttp`](/ServeSharp.NetHttp) |
+| [`System.Net`](https://learn.microsoft.com/en-us/dotnet/api/system.net) | [`ServeSharp.NetHttpListener`](/ServeSharp.NetHttpListener) |
 | [CefSharp](https://github.com/cefsharp/CefSharp) | [`ServeSharp.CefSharpCore`](/ServeSharp.CefSharpCore) |
-| `Microsoft.AspNetCore.Http` | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) |
+| [`Microsoft.AspNetCore.Http`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http) | [`ServeSharp.AspNetCore`](/ServeSharp.AspNetCore) |
 
 <details>
 <summary>Using an Existing Server</summary>

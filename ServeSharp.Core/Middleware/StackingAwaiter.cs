@@ -91,7 +91,9 @@ public sealed class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompl
                 // The action starts from this.GetResult(), so if there is one pending exception, the action will immediately receive the exception.
                 action();
             }
+#pragma warning disable CA1031
             catch (Exception ex)
+#pragma warning restore CA1031
             {
                 // If the action did not do try {await xxx}, the exception will be back here, so we can try the next action.
                 // If the exception is not handled anywhere inside the action stack, it will bubble back to the function where this object is disposed.

@@ -1,62 +1,36 @@
 ﻿using ServeSharp.Core;
 using ServeSharp.Core.Middleware;
-using ServeSharp.Core.Path;
-using sly.parser;
-using System.Collections.Generic;
+using ServeSharp.Core.Router;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
+using ServeSharp.Core.Path;
+using CefSharp;
+using System.Threading.Tasks;
 
 namespace ServeSharp.CefSharpCore;
 
-public class Router : IPathGroup<Context, Route>
+public class Router : Router<Context, Route>, IPathGroup<Context, Route>, ISchemeHandlerFactory
 {
-    private readonly List<Route> _routes = [];
-    private readonly Parser<RouteToken, Matcher> _parser = Parser.New();
-    private readonly List<HandleFunc<Context>> _middlewares = [];
-
-    public bool AutoHead { get; set; } = true;
-    public HandleFunc<Context> NotFound { private get; set; } = DefaultNotFoundHandler;
-
-    public void Use(params HandleFunc<Context>[] handlers) => _middlewares.AddRange(handlers);
-
-    public IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
-
-    internal Route Route(Route route)
+    public Router()
     {
-        _routes.Add(route);
-        return route;
+        NotFound = DefaultNotFoundHandler;
     }
 
-    public Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
+    public override IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
+
+    public override Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
     {
-        var pr = _parser.Parse(path);
+        var pr = Parser.Parse(path);
         pr.ThrowIfError();
 
-        var ret = new Route(method, pr.Result, _middlewares.Concat(handlers).ToArray())
+        var ret = new Route(method, pr.Result, Middlewares.Concat(handlers).ToArray())
         {
             OriginalRouteDefinition = path,
         };
 
-        return Route(ret);
-    }
-
-    public async Middleware Handle(Context context)
-    {
-        var stack = _routes.FirstOrDefault(route => route.Match(context))?.Stack ?? NotFoundStack;
-
-        // StackingAwaiter must be created here so that task continuations are flattened to this level.
-        var next = new StackingAwaiter();
-        try
-        {
-            await stack.Handle(context, next);
-        }
-        finally
-        {
-            // https://stackoverflow.com/a/70887681
-            await next.DisposeAsync().ConfigureAwait(false);
-        }
+        Handle(ret);
+        return ret;
     }
 
     private static Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
@@ -71,16 +45,28 @@ public class Router : IPathGroup<Context, Route>
         return Middleware.CompletedTask;
     }
 
-    private MiddlewareStack<Context> NotFoundStack => new(_middlewares.Append(NotFound).ToArray());
-
-    public override string ToString()
+    public async Task<IResourceHandler> ServeHttp(IBrowser browser, IFrame frame, string schemeName, IRequest request)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("[Router]");
-        foreach (var r in _routes)
-        {
-            sb.AppendLine(r.ToString());
-        }
-        return sb.ToString();
+        using var context = new Context();
+        context.Http.Browser = browser;
+        context.Http.Frame = frame;
+        context.Http.SchemeName = schemeName;
+        context.Http.Request = request;
+
+        await ServeHttp(context);
+
+        // do not dispose the ResourceHandler with the context
+#pragma warning disable CA2000
+        var ret = context.Http.ResourceHandler ?? new CancellingResourceHandler();
+#pragma warning restore CA2000
+        context.Http.ResourceHandler = null;
+        return ret;
     }
+
+    #region impl of ISchemeHandlerFactory
+
+    public IResourceHandler Create(IBrowser browser, IFrame frame, string schemeName, IRequest request) =>
+        ServeHttp(browser, frame, schemeName, request).GetAwaiter().GetResult();
+
+    #endregion
 }

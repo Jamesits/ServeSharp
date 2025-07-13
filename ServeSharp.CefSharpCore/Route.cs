@@ -2,20 +2,13 @@
 using ServeSharp.Core.Path;
 using System;
 using System.Net.Http;
+using ServeSharp.Core.Router;
 
 namespace ServeSharp.CefSharpCore;
 
-public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers)
+public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers) : Route<Context>(method, matcher, handlers)
 {
-    public string Name { get; set; } = "UNNAMED";
-    public string OriginalRouteDefinition { get; internal set; } = "";
-    public Matcher Matcher { get; } = matcher;
-    public HttpMethod? Method { get; } = method;
-    private readonly HandleFunc<Context>[] _handlers = handlers ?? throw new ArgumentNullException(nameof(handlers));
-
-    public override string ToString() => $"{Name} {Method?.ToString() ?? "ANY"} Handler[{_handlers.Length}] {OriginalRouteDefinition}";
-
-    public bool Match(Context context)
+    public override bool Match(Context context)
     {
         if (context == null)
         {
@@ -36,10 +29,7 @@ public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Contex
         // test path
         var url = new Uri(context.Http.Request.Url);
         var ret = Matcher.Match(url.AbsolutePath, out _, out var bindings);
-        context.Http.UrlBindings = bindings;
+        context.UrlBindings = bindings;
         return ret;
     }
-
-    public MiddlewareStack<Context> Stack => new MiddlewareStack<Context>(_handlers);
 }
-

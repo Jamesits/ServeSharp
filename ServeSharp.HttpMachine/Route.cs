@@ -4,7 +4,7 @@ using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 using ServeSharp.Core.Router;
 
-namespace ServeSharp.NetHttp;
+namespace ServeSharp.HttpMachine;
 
 public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Context>[] handlers) : Route<Context>(method, matcher, handlers)
 {
@@ -14,20 +14,20 @@ public class Route(HttpMethod? method, Matcher matcher, params HandleFunc<Contex
         {
             throw new ArgumentNullException(nameof(context));
         }
-        if (context.Http.Request == null)
+        if (context.Request == null)
         {
-            throw new ArgumentNullException(nameof(context), "context.Http.Request is null");
+            throw new ArgumentNullException(nameof(context), "context.Request is null");
         }
 
         // method == null: match any
         if (Method != null)
         {
             // test method
-            if (Method != context.Http.Request.Method) return false;
+            if (Method != new HttpMethod(context.Request.HttpMethod)) return false;
         }
 
         // test path
-        var ret = Matcher.Match(context.Http.Request.RequestUri.AbsolutePath, out _, out var bindings);
+        var ret = Matcher.Match(context.Request.Url.AbsolutePath, out _, out var bindings);
         context.UrlBindings = bindings;
         return ret;
     }

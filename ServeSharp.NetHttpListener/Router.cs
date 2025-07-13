@@ -1,13 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using ServeSharp.Core;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 using ServeSharp.Core.Router;
 
-namespace ServeSharp.AspNetCore;
+namespace ServeSharp.NetHttpListener;
 
 public class Router : Router<Context, Route>, IPathGroup<Context, Route>
 {
@@ -17,12 +18,6 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
     }
 
     public override IPathGroup<Context, Route> Group(string path) => new RouteGroup(this, path);
-
-    internal Route Route(Route route)
-    {
-        Routes.Add(route);
-        return route;
-    }
 
     public override Route Handle(HttpMethod? method, string path, params HandleFunc<Context>[] handlers)
     {
@@ -34,24 +29,20 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
             OriginalRouteDefinition = path,
         };
 
-        return Route(ret);
+        Handle(ret);
+        return ret;
     }
 
-    private static async Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
+    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
     {
-        context.Http.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
-        context.Http.HttpContext!.Response.ContentType = "text/plain";
-        await context.Http.HttpContext.Response.WriteAsync("404 NOT FOUND").ConfigureAwait(false);
+        Console.WriteLine("404 NOT FOUND");
+        return Middleware.CompletedTask;
     }
 
-    public async Task ServeHttp(HttpContext httpContext)
+    public async Task ServeHttp(HttpListenerContext httpListenerContext)
     {
         using var ctx = new Context();
-        ctx.Http.HttpContext = httpContext;
-
+        ctx.Http.HttpListenerContext = httpListenerContext;
         await ServeHttp(ctx);
-
-        // prevent context being disposed
-        ctx.Http.HttpContext = null;
     }
 }

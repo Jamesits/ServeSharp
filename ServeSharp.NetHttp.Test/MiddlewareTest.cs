@@ -29,7 +29,7 @@ public static class CustomContextMiddleware
     }
 }
 
-internal class MiddlewareTest
+internal sealed class MiddlewareTest
 {
     private Router? _router;
     [SetUp]

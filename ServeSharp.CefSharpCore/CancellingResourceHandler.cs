@@ -6,7 +6,7 @@ public class CancellingResourceHandler : ResourceHandler
 {
     public override CefReturnValue ProcessRequestAsync(IRequest request, ICallback callback)
     {
-        callback.Dispose();
+        callback!.Dispose();
         return CefReturnValue.Cancel;
     }
 }

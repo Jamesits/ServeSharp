@@ -1,3 +1,4 @@
+#pragma warning disable CA1303
 using ServeSharp.Core.Middleware;
 using System.Collections.Concurrent;
 
@@ -70,14 +71,16 @@ public class MiddlewareTest
     {
         resultQueue.Enqueue(301);
 
-        async Task f()
+        await F().ConfigureAwait(false);
+
+        resultQueue.Enqueue(304);
+        return;
+
+        async Task F()
         {
             resultQueue.Enqueue(302);
             await Task.Delay(2).ConfigureAwait(false);
             resultQueue.Enqueue(303);
         }
-        await f().ConfigureAwait(false);
-
-        resultQueue.Enqueue(304);
     }
 }

@@ -10,6 +10,7 @@ public class Context : Dictionary<string, object>, IDisposable, IContext
     private bool _disposed;
     private readonly DictionaryAdapterFactory _factory = new();
 
+    #region Dictionary utilities
     public object? Swap(string key, object thing)
     {
         var originalObject = GetOrDefault(key, null);
@@ -21,7 +22,7 @@ public class Context : Dictionary<string, object>, IDisposable, IContext
     {
         var originalObject = GetOrDefault(key, default(T));
         Add(key, thing);
-        return originalObject as T;
+        return originalObject;
     }
 
     public object Get(string key) => this[key];
@@ -42,11 +43,24 @@ public class Context : Dictionary<string, object>, IDisposable, IContext
         }
 
         value = tValue;
-        return true;
+        return ret;
     }
+    #endregion
 
     public T GetAdapter<T>() => _factory.GetAdapter<T>(this);
 
+    public IServeSharpContext ServeSharpContext => GetAdapter<IServeSharpContext>();
+
+    #region Generic contracts
+
+    public Dictionary<string, string>? UrlBindings
+    {
+        get => ServeSharpContext.UrlBindings;
+        set => ServeSharpContext.UrlBindings = value;
+    }
+    #endregion
+
+    #region impl of IDisposable
     public void Dispose()
     {
         Dispose(true);
@@ -82,6 +96,8 @@ public class Context : Dictionary<string, object>, IDisposable, IContext
             _disposed = true;
         }
     }
+
+    #endregion
 
     ~Context()
     {

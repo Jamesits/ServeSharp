@@ -104,7 +104,10 @@ public class MiddlewareAsyncMethodBuilder
 
     // Not used when we are a class
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#pragma warning disable CA1822
+    // ReSharper disable once UnusedMember.Global
     public void SetStateMachine(IAsyncStateMachine stateMachine) { }
+#pragma warning restore CA1822
 
     // Will be called if there is an exception thrown in the async function
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

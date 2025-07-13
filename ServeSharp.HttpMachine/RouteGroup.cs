@@ -1,7 +1,7 @@
 ﻿using ServeSharp.Core;
 using ServeSharp.Core.Router;
 
-namespace ServeSharp.CefSharpCore;
+namespace ServeSharp.HttpMachine;
 
 public class RouteGroup(IPathGroup<Context, Route> parent, string path)
     : PassThroughRouteGroup<Context, Route>(parent, path);
