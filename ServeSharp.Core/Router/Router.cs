@@ -41,7 +41,7 @@ public abstract class Router<TContext, TRoute> : IPathGroup<TContext, TRoute>, I
         finally
         {
             // https://stackoverflow.com/a/70887681
-            await next.DisposeAsync().ConfigureAwait(false);
+            await next.DisposeAsync();
         }
     }
 

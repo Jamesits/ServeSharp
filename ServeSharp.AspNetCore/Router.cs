@@ -41,7 +41,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
     {
         context.Http.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
         context.Http.HttpContext!.Response.ContentType = "text/plain";
-        await context.Http.HttpContext.Response.WriteAsync("404 NOT FOUND").ConfigureAwait(false);
+        await context.Http.HttpContext.Response.WriteAsync("404 NOT FOUND");
     }
 
     public async Task ServeHttp(HttpContext httpContext)

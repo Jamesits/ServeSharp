@@ -14,8 +14,7 @@ public static class HttpResponseMessageExtensions
         if (response == null) throw new InvalidOperationException("null response");
 
         using var m = new MemoryStream();
-        var writer = new BinaryWriter(m, Encoding.UTF8);
-        await using var writer1 = writer.ConfigureAwait(false);
+        using var writer = new BinaryWriter(m, Encoding.UTF8);
         writer.WriteString($"HTTP/1.1 {(int)response.StatusCode} {response.ReasonPhrase}\r\n");
         // var str = System.Text.Encoding.Default.GetString(m.ToArray());
 
@@ -44,12 +43,12 @@ public static class HttpResponseMessageExtensions
 
         if (response.Content != null)
         {
-            var buf = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            var buf = await response.Content.ReadAsByteArrayAsync();
             writer.Write(buf);
             writer.WriteString("\r\n\r\n");
         }
         writer.Flush();
-        await m.FlushAsync().ConfigureAwait(false);
+        await m.FlushAsync();
 
         return m.ToArray();
     }
