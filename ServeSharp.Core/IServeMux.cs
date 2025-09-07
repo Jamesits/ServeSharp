@@ -1,5 +1,7 @@
-﻿namespace ServeSharp.Core;
+﻿using System.Threading.Tasks;
+
+namespace ServeSharp.Core;
 public interface IServeMux<in TContext>
 {
-    public Middleware.Middleware ServeHttp(TContext context);
+    public Task ServeHttp(TContext context);
 }

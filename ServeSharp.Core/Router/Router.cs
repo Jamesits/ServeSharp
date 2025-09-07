@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ServeSharp.Core.Router;
 
@@ -28,7 +29,7 @@ public abstract class Router<TContext, TRoute> : IPathGroup<TContext, TRoute>, I
         Routes.AddRange(routes);
     }
 
-    public async Middleware.Middleware ServeHttp(TContext context)
+    public async Task ServeHttp(TContext context)
     {
         var stack = Routes.FirstOrDefault(route => route.Match(context))?.Stack ?? NotFoundStack;
 
