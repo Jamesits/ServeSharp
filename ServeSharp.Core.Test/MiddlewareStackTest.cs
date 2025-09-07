@@ -176,6 +176,16 @@ public class MiddlewareStackTest
         [101, 601, 201, 401, 608, 609, 109]);
     }
 
+    [Test]
+    public async Task TestRecoveryTerminatingMiddlewareStack2()
+    {
+        await Execute(new MiddlewareStack<ConcurrentQueue<int>>(
+            RecoveryMiddleware,
+            ExceptionBeforeInTaskMiddleware
+        ),
+        [601, 1101, 1102, 608, 609]);
+    }
+
     // When exception is thrown, `try` should be cancelled, then `finally` should run, then control flow returns to the upper middleware; exception should be rethrown.
     [Test]
     public Task TestFinalizingTask()
@@ -259,6 +269,11 @@ public class MiddlewareStackTest
             await using var next = new StackingAwaiter();
             await stack.Handle(resultQueue, next);
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Captured exception: {0}", ex.ToString());
+            throw;
+        }
         finally
         {
             Console.WriteLine("Expected: [{0}]", string.Join(", ", expectedSeq));
@@ -310,6 +325,14 @@ public class MiddlewareStackTest
         throw new InvalidOperationException();
     }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+
+    private static async Middleware.Middleware ExceptionBeforeInTaskMiddleware(ConcurrentQueue<int> context, IAwaitable next)
+    {
+        context.Enqueue(1101);
+        await Task.Yield();
+        context.Enqueue(1102);
+        throw new InvalidOperationException();
+    }
 
     // Middleware that throws after calling the next middleware
     private static async Middleware.Middleware ExceptionAfterMiddleware(ConcurrentQueue<int> context, IAwaitable next)
