@@ -57,7 +57,7 @@ public class Middleware : IAwaitable, IAwaiter, ICriticalNotifyCompletion
 
     // Used by AsyncMethodBuilder
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void SetException(Exception exception)
+    internal void SetException(Exception? exception)
     {
         lock (this)
         {
@@ -70,7 +70,9 @@ public class Middleware : IAwaitable, IAwaiter, ICriticalNotifyCompletion
     {
         lock (this)
         {
-            return _exception;
+            var ret = _exception;
+            _exception = null;
+            return ret;
         }
     }
 
@@ -156,6 +158,8 @@ public class MiddlewareAsyncMethodBuilder
         {
             _ctsTopHalf.Cancel();
             _ctsLowerHalf.Cancel();
+
+            // Here is the final chance of throwing the residue exception
             var ex = Task.GetException();
             if (ex != null)
             {
