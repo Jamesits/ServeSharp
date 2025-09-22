@@ -1,6 +1,6 @@
 ﻿# ServeSharp
 
-HTTP router and Task in C# that does not depend on any web framework.
+HTTP router and Middleware in C# that does not depend on any web framework.
 
 ![Works - On My Machine](https://img.shields.io/badge/Works-On_My_Machine-2ea44f) ![Project Status - Premature](https://img.shields.io/badge/Project_Status-Premature-yellow)
 
@@ -10,7 +10,7 @@ Note: Before v1.0.0, APIs are due to heavy change.
 
 ### Choose an Implementation Path
 
-ServeSharp can be used as a standalone HTTP server, a Task for an existing HTTP server, an in-process server for a webview frontend, or a router for any RPC-like request/response interface.
+ServeSharp can be used as a standalone HTTP server, a middleware for an existing HTTP server, an in-process server for a webview frontend, or a router for any RPC-like request/response interface.
 
 There are a lot HTTP request/response class implementations in the C#/.NET ecosystem, and they provide different interfaces. If you happened to use one listed below, use the specific package. Otherwise, use `ServeSharp.Core` to create a router for your request/response type in less than 50 lines of code.
 
@@ -40,6 +40,7 @@ There are a lot HTTP request/response class implementations in the C#/.NET ecosy
 <summary>Using an Existing Router</summary>
 
 ```csharp
+using System.Threading.Tasks;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
 // import the implementation corresponding to your HTTP request/response type
@@ -98,9 +99,9 @@ Steps:
 
 ### Middleware
 
-When a route is matched, the router will pass the context to a chain of middlewares. Each Task can do something before and after the next Task is called. A route handler is also a middleware.
+When a route is matched, the router will pass the context to a chain of middlewares. Each middleware can do something before and after the next middleware is called. A route handler is also a middleware.
 
-Use `Router.Use(middleware1, [middleware2, ...])` to add middlewares to the router. The middlewares will be executed in the order they are added. Task is only effective for the routes that are added after it.
+Use `Router.Use(middleware1, [middleware2, ...])` to add middlewares to the router. The middlewares will be executed in the order they are added. middleware is only effective for the routes that are added after it.
 
 <details>
 <summary>Route Handler</summary>
@@ -117,8 +118,8 @@ public Task GetRoot(Context context, IAwaitable _) {
     // set the response content
     context.Http.Response.Content = "Hello, world!";
 
-    // no need to call next, as this is the end of the Task chain
-    return Middleware.CompletedTask;
+    // no need to call next, as this is the end of the middleware chain
+    return Task.CompletedTask;
 }
 ```
 
@@ -151,7 +152,7 @@ public Task CustomLogger(Context context, IAwaitable next) {
     // do something after
     Console.WriteLine("After");
 
-    return Middleware.CompletedTask;
+    return Task.CompletedTask;
 }
 ```
 
@@ -160,7 +161,7 @@ public Task CustomLogger(Context context, IAwaitable next) {
 <details>
 <summary>Exception Handling (Recovery) Middleware</summary>
 
-If any Task throws an exception, the exception is wrapped in an `AggregatedException`(to preserve the original stack informat) then bubbled up to every Task in the chain on top of the one that threw the exception. You can catch and handle the exception [as described in the documentation](https://learn.microsoft.com/en-us/dotnet/api/system.aggregateexception.flatten#examples).
+If any middleware throws an exception, the exception is wrapped in an `AggregatedException`(to preserve the original stack informat) then bubbled up to every middleware in the chain on top of the one that threw the exception. You can catch and handle the exception [as described in the documentation](https://learn.microsoft.com/en-us/dotnet/api/system.aggregateexception.flatten#examples).
 
 ```csharp
 public async Task Recovery(Context context, IAwaitable next) {
@@ -209,7 +210,7 @@ If your project has sufficiently high .NET version, after adding this package, y
 System.MissingMethodException: Method not found: ...
 ```
 
-This is because this package uses an older version of target framework for maximum compatibility, which might cause CLR to not find some methods when the function invocation passes through the Task chain. To fix this, use the package-provided version of these functions (e.g. `dotnet add System.Text.Json`) rather than using the framework-provided one. [Here is an excellent article explaining why this happens](https://sergeyteplyakov.github.io/Blog/csharp/2024/03/21/Mythical_MissingMethodException.html).
+This is because this package uses an older version of target framework for maximum compatibility, which might cause CLR to not find some methods when the function invocation passes through the middleware chain. To fix this, use the package-provided version of these functions (e.g. `dotnet add System.Text.Json`) rather than using the framework-provided one. [Here is an excellent article explaining why this happens](https://sergeyteplyakov.github.io/Blog/csharp/2024/03/21/Mythical_MissingMethodException.html).
 
 ## Acknowledgements
 
