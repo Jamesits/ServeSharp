@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using ServeSharp.Core;
 using ServeSharp.Core.Middleware;
 using ServeSharp.Core.Path;
@@ -31,9 +32,9 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
         return ret;
     }
 
-    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
+    private static Task DefaultNotFoundHandler(Context context, IAwaitable next)
     {
         Console.WriteLine("404 NOT FOUND");
-        return Middleware.CompletedTask;
+        return Task.CompletedTask;
     }
 }

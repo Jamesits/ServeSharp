@@ -15,7 +15,7 @@ router.Get("/", (context, _) =>
     resp.Body = new MemoryStream(Encoding.UTF8.GetBytes("<h1>It works!</h1>"));
 
     context.Http.Response = resp;
-    return Middleware.CompletedTask;
+    return Task.CompletedTask;
 });
 
 var ipAddress = new IPAddress([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -25,7 +25,7 @@ server.Bind(ipEndPoint);
 
 while (true)
 {
-    var receivingSocket = await server.AcceptAsync();
+    var receivingSocket = await server.AcceptAsync().ConfigureAwait(false);
     // emit a task to handle the TCP connection
     _ = Task.Run(async () =>
     {
@@ -35,7 +35,7 @@ while (true)
         while (true)
         {
             var buffer = new byte[1024];
-            await receivingSocket.ReceiveAsync(buffer, SocketFlags.None);
+            await receivingSocket.ReceiveAsync(buffer, SocketFlags.None).ConfigureAwait(false);
             parser.Execute(buffer);
 
             if (handler.HttpRequestResponse.IsUnableToParseHttp) throw new InvalidDataException("Unable to parse HTTP request");
@@ -48,10 +48,10 @@ while (true)
         // Routing
         using var ctx = new Context();
         ctx.Http.Request = handler.HttpRequestResponse;
-        await router.ServeHttp(ctx);
+        await router.ServeHttp(ctx).ConfigureAwait(false);
 
         // Replying
-        await receivingSocket.SendAsync(ctx.Response!.ToBytes());
+        await receivingSocket.SendAsync(ctx.Response!.ToBytes()).ConfigureAwait(false);
         receivingSocket.Close();
     }).ConfigureAwait(false);
 }

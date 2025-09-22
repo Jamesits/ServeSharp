@@ -10,7 +10,7 @@ public static class HttpListenerResponseExtensions
     {
         var buf = Encoding.UTF8.GetBytes(content);
         response.ContentLength64 = buf.LongLength;
-        await response.OutputStream.WriteAsync(buf, cancellationToken);
+        await response.OutputStream.WriteAsync(buf, cancellationToken).ConfigureAwait(false);
         response.OutputStream.Close();
     }
 }

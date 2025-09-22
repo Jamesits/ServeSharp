@@ -33,7 +33,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>, ISchem
         return ret;
     }
 
-    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
+    private static Task DefaultNotFoundHandler(Context context, IAwaitable _)
     {
         var handler = new ContinuingResourceHandler()
         {
@@ -42,7 +42,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>, ISchem
             Stream = new MemoryStream("404 Not Found"u8.ToArray())
         };
         context.Http.ResourceHandler = handler;
-        return Middleware.CompletedTask;
+        return Task.CompletedTask;
     }
 
     public async Task<IResourceHandler> ServeHttp(IBrowser browser, IFrame frame, string schemeName, IRequest request)
@@ -53,7 +53,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>, ISchem
         context.Http.SchemeName = schemeName;
         context.Http.Request = request;
 
-        await ServeHttp(context);
+        await ServeHttp(context).ConfigureAwait(false);
 
         // do not dispose the ResourceHandler with the context
 #pragma warning disable CA2000

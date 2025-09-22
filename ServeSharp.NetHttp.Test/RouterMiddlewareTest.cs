@@ -21,7 +21,7 @@ internal sealed class RouterMiddlewareTest
             {
                 Content = new StringContent("root"),
             };
-            return Middleware.CompletedTask;
+            return Task.CompletedTask;
         });
         Console.WriteLine(_router);
     }
@@ -32,7 +32,7 @@ internal sealed class RouterMiddlewareTest
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/root");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 #pragma warning disable CA2007
@@ -53,7 +53,7 @@ internal sealed class RouterMiddlewareTest
         };
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
     }
@@ -70,7 +70,7 @@ internal sealed class RouterMiddlewareTest
         };
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
         Assert.That(ctx.Http.Response, Is.Not.Null);
         Assert.That(ctx.Http.Response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
 #pragma warning disable CA2007
@@ -78,16 +78,16 @@ internal sealed class RouterMiddlewareTest
 #pragma warning restore CA2007
     }
 
-    public static Middleware NotFoundCrashHandler(Context context, IAwaitable _)
+    public static Task NotFoundCrashHandler(Context context, IAwaitable _)
     {
         context.Http.Response = new HttpResponseMessage(HttpStatusCode.NotFound)
         {
             Content = new StringContent("Not Found"),
         };
-        return Middleware.CompletedTask;
+        return Task.CompletedTask;
     }
 
-    public static async Middleware CorsMiddleware(Context context, IAwaitable next)
+    public static async Task CorsMiddleware(Context context, IAwaitable next)
     {
         ArgumentNullException.ThrowIfNull(context.Http.Request?.RequestUri?.LocalPath);
 

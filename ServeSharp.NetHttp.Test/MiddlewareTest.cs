@@ -13,13 +13,13 @@ public static class CustomContextMiddleware
 {
     public static ICustomContext CustomContext(this Context context) => context!.GetAdapter<ICustomContext>();
 
-    public static async Middleware SetContext(Context context, IAwaitable next)
+    public static async Task SetContext(Context context, IAwaitable next)
     {
         context.CustomContext().CustomItem1 = "114514";
         await next;
     }
 
-    public static async Middleware AssertContext(Context context, IAwaitable next)
+    public static async Task AssertContext(Context context, IAwaitable next)
     {
         if (context.CustomContext().CustomItem1 != "114514")
         {
@@ -54,6 +54,6 @@ internal sealed class MiddlewareTest
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
     }
 }

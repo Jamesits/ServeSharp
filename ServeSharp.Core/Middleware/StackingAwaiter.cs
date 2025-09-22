@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ServeSharp.Core.Middleware;
@@ -12,34 +13,20 @@ namespace ServeSharp.Core.Middleware;
 /// </summary>
 public sealed class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompletion, IDisposable, IAsyncDisposable
 {
-    // Prevents invocation after disposal
-    private bool _completed;
-    // Keeps track of any deferred code blocks
-    private readonly ConcurrentStack<Action> _completions = new();
+    private Stack<Action> _deferStack = new();
     // Queued exception to be raised on `await`
     private AggregateException? _exception;
-    private bool _currentStackHasCallback;
+    private CancellationTokenSource _ctsTopHalfDone = new();
 
-    // Signal that we are entering a new middleware func
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal void StackPush()
-    {
-        lock (this)
-        {
-            _currentStackHasCallback = false;
-        }
-    }
+    public CancellationToken CancellationToken => _ctsTopHalfDone.Token;
 
-    // Signal that we have exited a middleware func (either by returning or at `await next`).
-    // Returns true if it returned from an `await next`
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal bool StackPop()
+    public void Continue()
     {
-        lock (this)
+        _ctsTopHalfDone.Cancel();
+        while (_deferStack.Count > 0)
         {
-            var ret = _currentStackHasCallback;
-            _currentStackHasCallback = false;
-            return ret;
+            var c = _deferStack.Pop();
+            c();
         }
     }
 
@@ -47,74 +34,35 @@ public sealed class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompl
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void QueueException(Exception? exception)
     {
-        lock (this)
-        {
-            // Always save the original exception inside one AggregateException, since stack information is wiped if the exception is re-thrown.
-            _exception = _exception.Append(exception);
-        }
+        // Always save the original exception inside one AggregateException, since stack information is wiped if the exception is re-thrown.
+        _exception = _exception.Append(exception);
     }
 
     // Manually add functions to the defer stack
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal void Defer(Action action)
     {
-        lock (this)
+        var capturedContext = SynchronizationContext.Current;
+        _deferStack.Push(() =>
         {
-            if (_completed)
-            {
-                throw new InvalidOperationException("Use of StackingAwaiter after disposal");
-            }
-
-            _currentStackHasCallback = true;
-            _completions.Push(action);
-        }
-    }
-
-    // Execute the deferred code blocks and mark the object as disposed
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ContinueAll()
-    {
-        lock (this)
-        {
-            if (_completed) return;
-            _completed = true;
-        }
-
-        while (true)
-        {
-            var ok = _completions.TryPop(out var action);
-            if (!ok) break;
-
-            // Notes on exception handling
-            try
-            {
-                // The action starts from this.GetResult(), so if there is one pending exception, the action will immediately receive the exception.
+            if (capturedContext != null)
+                capturedContext.Post(_ => action(), null);
+            else
                 action();
-            }
-#pragma warning disable CA1031
-            catch (Exception ex)
-#pragma warning restore CA1031
-            {
-                // If the action did not do try {await xxx}, the exception will be back here, so we can try the next action.
-                // If the exception is not handled anywhere inside the action stack, it will bubble back to the function where this object is disposed.
-                QueueException(ex);
-            }
-        }
-
-        // throw any exception that has not been processed by the deferred code blocks
-        GetResult();
+        });
+        _ctsTopHalfDone.Cancel();
     }
     #region impl of ICriticalNotifyCompletion
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void OnCompleted(Action completion) => Defer(completion);
+    public void OnCompleted(Action continuation) => Defer(continuation);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void UnsafeOnCompleted(Action completion) => Defer(completion);
+    public void UnsafeOnCompleted(Action continuation) => Defer(continuation);
 
     #endregion
 
-    #region impl of Middleware type (Awaitable expressions)
+    #region impl of Task type (Awaitable expressions)
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IAwaiter GetAwaiter() => this;
@@ -124,43 +72,31 @@ public sealed class StackingAwaiter : IAwaiter, IAwaitable, ICriticalNotifyCompl
     #region impl of Awaiter
 
     // IsCompleted should always return false unless the object has been disposed, so that we can stash the following state machine invocation into our stack.
-    public bool IsCompleted
-    {
-        get
-        {
-            lock (this)
-            {
-                return _completed;
-            }
-        }
-    }
+    public bool IsCompleted => false;
     // Signal that we are done immediately
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void GetResult()
     {
-        lock (this)
+        _ctsTopHalfDone.Token.WaitHandle.WaitOne();
+        if (_exception != null)
         {
             var ex = _exception;
             _exception = null;
-            if (ex != null)
-            {
-                throw ex;
-            }
+            throw ex;
         }
     }
-
     #endregion
 
-    #region impl of IDisposable and IAsyncDisposable
+    #region impl of IDisposable
 
-    // impl of IDisposable and IAsyncDisposable
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose() => ContinueAll();
+    public void Dispose()
+    {
+        _ctsTopHalfDone.Dispose();
+    }
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public async ValueTask DisposeAsync() => ContinueAll();
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
-
+    public async ValueTask DisposeAsync()
+    {
+        await Task.Run(Dispose).ConfigureAwait(false);
+    }
     #endregion
 }

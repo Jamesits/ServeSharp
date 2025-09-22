@@ -34,7 +34,7 @@ The `Middleware.MiddlewareStack<TContext>` class allow you to define function st
 Example:
 ```csharp
 // Async-style middleware
-async Middleware func1(TContext context, IAwaiter next)
+async Task func1(TContext context, IAwaiter next)
 {
 	// func1_before
 	await next;
@@ -42,7 +42,7 @@ async Middleware func1(TContext context, IAwaiter next)
 }
 
 // Sync-style middleware
-Middleware func2(TContext context, IAwaiter next)
+Task func2(TContext context, IAwaiter next)
 {
 	// func2_before
 	next.GetAwaiter().GetResult();
@@ -50,7 +50,7 @@ Middleware func2(TContext context, IAwaiter next)
 	return Middleware.CompletedTask;
 }
 
-async Middleware func3(TContext context, IAwaiter _) {
+async Task func3(TContext context, IAwaiter _) {
 	// func3
 	// You don't need to call next if you are the last function in the stack 
 }
@@ -79,10 +79,10 @@ await Task.Run(async () => {
 
 ### Exception Handling
 
-If one middleware throws an exception, the stack will stop executing, and the exception will be wrapped in an `AggregateException` and thrown to the `await next;` line of all the previous middlewares in the stack in order. Optionally, previous middleware can catch the exception and handle it.
+If one Task throws an exception, the stack will stop executing, and the exception will be wrapped in an `AggregateException` and thrown to the `await next;` line of all the previous middlewares in the stack in order. Optionally, previous Task can catch the exception and handle it.
 
 ```csharp
-async Middleware Recovery(TContext context, IAwaitable next) {
+async Task Recovery(TContext context, IAwaitable next) {
     try {
         await next;
     } catch (AggregateException ex) {

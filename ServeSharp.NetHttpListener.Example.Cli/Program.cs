@@ -24,5 +24,5 @@ Console.CancelKeyPress += (_, _) =>
 listener.Start();
 while (true)
 {
-    await router.ServeHttp(await listener.GetContextAsync());
+    await router.ServeHttp(await listener.GetContextAsync().ConfigureAwait(false)).ConfigureAwait(false);
 }

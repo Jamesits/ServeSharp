@@ -9,7 +9,7 @@ public static class HttpResponseExtensions
     public static byte[] ToBytes(this IHttpRequestResponse response)
     {
         var stream = new MemoryStream();
-        var writer = new BinaryWriter(stream);
+        using var writer = new BinaryWriter(stream);
 
         // write header
         writer.WriteString($"HTTP/{response.MajorVersion}.{response.MinorVersion} {response.StatusCode} {response.ResponseReason}\r\n");

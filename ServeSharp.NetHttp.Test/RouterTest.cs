@@ -17,33 +17,33 @@ internal sealed class RouterTest
 
         _router.Use(async (_, next) =>
         {
-            Console.WriteLine("Middleware 1 enter");
+            Console.WriteLine("Task 1 enter");
             await next;
-            Console.WriteLine("Middleware 1 exit");
+            Console.WriteLine("Task 1 exit");
         });
         _router.Use(async (_, next) =>
         {
-            Console.WriteLine("Middleware 2 enter");
+            Console.WriteLine("Task 2 enter");
             // throw new NotImplementedException();
             await next;
             // throw new NotImplementedException();
-            Console.WriteLine("Middleware 2 exit");
+            Console.WriteLine("Task 2 exit");
         });
 
         _router.Get("/root", (_, _) =>
         {
             Console.WriteLine("GetAdapter root");
-            return Middleware.CompletedTask;
+            return Task.CompletedTask;
         });
         _router.Post(@"/{aaa}/child%aa%bb/114514/{bbb}/fds-{year : /\d{4}/}-{month : /\d{2}/}-{day : /\d{2}/}.html", (_, _) =>
         {
             Console.WriteLine("Post complex route");
-            return Middleware.CompletedTask;
+            return Task.CompletedTask;
         });
         _router.Group("/group1").Any("/any", (_, _) =>
         {
             Console.WriteLine("Any");
-            return Middleware.CompletedTask;
+            return Task.CompletedTask;
         });
 
         Console.WriteLine(_router);
@@ -55,7 +55,7 @@ internal sealed class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Get, "https://example.com/root");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
     }
 
     [Test]
@@ -64,7 +64,7 @@ internal sealed class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Post, "https://example.com/test1/child%aa%bb/114514/test2/fds-2023-01-01.html");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
     }
 
     [Test]
@@ -73,10 +73,10 @@ internal sealed class RouterTest
         var msg = new HttpRequestMessage(HttpMethod.Trace, "https://example.com/group1/any");
         using var ctx = new Context();
         ctx.Http.Request = msg;
-        await _router!.ServeHttp(ctx);
+        await _router!.ServeHttp(ctx).ConfigureAwait(false);
     }
 
-    public static async Middleware Recovery(Context context, IAwaitable next)
+    public static async Task Recovery(Context context, IAwaitable next)
     {
         Console.WriteLine("Recovery enter");
 

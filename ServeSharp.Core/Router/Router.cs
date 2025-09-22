@@ -32,18 +32,7 @@ public abstract class Router<TContext, TRoute> : IPathGroup<TContext, TRoute>, I
     public async Task ServeHttp(TContext context)
     {
         var stack = Routes.FirstOrDefault(route => route.Match(context))?.Stack ?? NotFoundStack;
-
-        // StackingAwaiter must be created here so that task continuations are flattened to this level.
-        var next = new StackingAwaiter();
-        try
-        {
-            await stack.Handle(context, next);
-        }
-        finally
-        {
-            // https://stackoverflow.com/a/70887681
-            await next.DisposeAsync().ConfigureAwait(false);
-        }
+        await stack.Handle(context).ConfigureAwait(false);
     }
 
     private MiddlewareStack<TContext> NotFoundStack => new(Middlewares.Append(NotFound).ToArray());
@@ -59,7 +48,7 @@ public abstract class Router<TContext, TRoute> : IPathGroup<TContext, TRoute>, I
         return sb.ToString();
     }
 
-    private static Middleware.Middleware DefaultNotFoundHandler(TContext context, IAwaitable next) => throw new NotImplementedException();
+    private static Task DefaultNotFoundHandler(TContext context, IAwaitable next) => throw new NotImplementedException();
 
     public abstract TRoute Handle(HttpMethod? method, string path, params HandleFunc<TContext>[] handlers);
     public abstract IPathGroup<TContext, TRoute> Group(string path);

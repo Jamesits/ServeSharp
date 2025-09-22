@@ -37,7 +37,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
         return Route(ret);
     }
 
-    private static async Middleware DefaultNotFoundHandler(Context context, IAwaitable _)
+    private static async Task DefaultNotFoundHandler(Context context, IAwaitable _)
     {
         context.Http.HttpContext!.Response.StatusCode = StatusCodes.Status404NotFound;
         context.Http.HttpContext!.Response.ContentType = "text/plain";
@@ -49,7 +49,7 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
         using var ctx = new Context();
         ctx.Http.HttpContext = httpContext;
 
-        await ServeHttp(ctx);
+        await ServeHttp(ctx).ConfigureAwait(false);
 
         // prevent context being disposed
         ctx.Http.HttpContext = null;

@@ -20,6 +20,6 @@ app.Map("/{*_}", router.ServeHttp);
 
 Console.CancelKeyPress += async (_, _) =>
 {
-    await app.StopAsync();
+    await app.StopAsync().ConfigureAwait(false);
 };
-await app.RunAsync();
+await app.RunAsync().ConfigureAwait(false);

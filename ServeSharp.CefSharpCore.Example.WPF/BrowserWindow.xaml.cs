@@ -32,7 +32,7 @@ public partial class BrowserWindow : IDisposable
                 MimeType = "text/html",
                 Stream = new MemoryStream("<h1>It works!</h1>"u8.ToArray()),
             };
-            return Middleware.CompletedTask;
+            return Task.CompletedTask;
         });
 
         _cefSettings = new CefSettings();

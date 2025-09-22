@@ -5,6 +5,7 @@ using System.Net.Http;
 using ServeSharp.Core.Path;
 using ServeSharp.Core;
 using ServeSharp.Core.Router;
+using System.Threading.Tasks;
 
 namespace ServeSharp.NetHttp;
 
@@ -31,9 +32,9 @@ public class Router : Router<Context, Route>, IPathGroup<Context, Route>
         return ret;
     }
 
-    private static Middleware DefaultNotFoundHandler(Context context, IAwaitable next)
+    private static Task DefaultNotFoundHandler(Context context, IAwaitable next)
     {
         Console.WriteLine("404 NOT FOUND");
-        return Middleware.CompletedTask;
+        return Task.CompletedTask;
     }
 }
