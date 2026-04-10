@@ -21,7 +21,7 @@ jobs:
       # https://github.com/orgs/community/discussions/26686#discussioncomment-3252850
       - name: Extract tag name
         id: tag
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
