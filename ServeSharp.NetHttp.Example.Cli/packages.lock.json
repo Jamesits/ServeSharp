@@ -1,14 +1,14 @@
 {
   "version": 1,
   "dependencies": {
-    "net8.0-windows7.0": {
-      "CefSharp.Wpf.NETCore": {
+    "net8.0": {
+      "HttpMachine.PCL": {
         "type": "Direct",
-        "requested": "[137.0.100, )",
-        "resolved": "137.0.100",
-        "contentHash": "UvARoqW/3YcF6pvyNzBMUzP4LiCfZVf0lweXXzfhqSXBNjb2JF/FOXre+9B3/2TUWNDlxmETgGotOwbCGoq0rg==",
+        "requested": "[5.0.1, )",
+        "resolved": "5.0.1",
+        "contentHash": "wZ+B7kfMBKGDat/ZfrB9T0dl/3OHr7Pj8oq/kGQgNfG0DFyZ58Ll/sVIhghQOFAy1B0YL32y0jVkOkpRCeVrLg==",
         "dependencies": {
-          "CefSharp.Common.NETCore": "[137.0.100]"
+          "IHttpMachine": "5.0.1"
         }
       },
       "Castle.Core": {
@@ -19,18 +19,10 @@
           "System.Diagnostics.EventLog": "6.0.0"
         }
       },
-      "CefSharp.Common.NETCore": {
+      "IHttpMachine": {
         "type": "Transitive",
-        "resolved": "137.0.100",
-        "contentHash": "0Ov52A64yVOUA8Ym6eW6/9WFpG5NU5rZZVJ6ojq+I7b+qbvNpSMufmsqb+xOze/I4O4VZlfVAfqW+7ZGeE9ZiA==",
-        "dependencies": {
-          "chromiumembeddedframework.runtime": "[137.0.10]"
-        }
-      },
-      "chromiumembeddedframework.runtime": {
-        "type": "Transitive",
-        "resolved": "137.0.10",
-        "contentHash": "y6kU5I4UgpANvpSGU3cb8XikJ5vCrfiO82E9tFhXNkOyygP/5iz2Ql2cg9YiO9ZUPrU6ME/4rw4NqwcmPAEmow=="
+        "resolved": "5.0.1",
+        "contentHash": "1JRYuI93WOSC2UCvibpwuuo6CluNRdvN6Frt9zWlFvTABjs3f0XzG9KjzLpfZxF8eQkS5F7JKGpwRw8WZc2ELw=="
       },
       "sly": {
         "type": "Transitive",
@@ -76,39 +68,18 @@
         "resolved": "4.6.1",
         "contentHash": "+RJT4qaekpZ7DDLhf+LTjq+E48jieKiY9ulJ+BoxKmZblIJfIJT8Ufcaa/clQqnYvWs8jugfGSMu8ylS0caG0w=="
       },
-      "servesharp.cefsharpcore": {
-        "type": "Project",
-        "dependencies": {
-          "CefSharp.Common.NETCore": "[137.0.100, )",
-          "ServeSharp.Core": "[1.0.0, )"
-        }
-      },
       "servesharp.core": {
         "type": "Project",
         "dependencies": {
           "Castle.Core": "[5.2.1, )",
           "sly": "[3.7.7, )"
         }
-      }
-    },
-    "net8.0-windows7.0/linux-x64": {
-      "CefSharp.Common.NETCore": {
-        "type": "Transitive",
-        "resolved": "137.0.100",
-        "contentHash": "0Ov52A64yVOUA8Ym6eW6/9WFpG5NU5rZZVJ6ojq+I7b+qbvNpSMufmsqb+xOze/I4O4VZlfVAfqW+7ZGeE9ZiA==",
+      },
+      "servesharp.nethttp": {
+        "type": "Project",
         "dependencies": {
-          "chromiumembeddedframework.runtime": "[137.0.10]"
+          "ServeSharp.Core": "[1.0.0, )"
         }
-      },
-      "System.Diagnostics.EventLog": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw=="
-      },
-      "System.Text.Encodings.Web": {
-        "type": "Transitive",
-        "resolved": "9.0.10",
-        "contentHash": "znmiJFUa0GGwq7t6ShUKBDRlPsNJaudNFI7rVeyGnRBhiRMegBvu2GRcadThP/QX/a5UpGgZbe6tolDooobj/Q=="
       }
     }
   }
