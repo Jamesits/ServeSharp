@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IHttpMachine" Version="5.0.1" />
+    <PackageReference Include="IHttpMachine" Version="6.2.0" />
   </ItemGroup>
 
   <ItemGroup>
