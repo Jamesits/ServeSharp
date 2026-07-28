@@ -4,9 +4,9 @@
     ".NETStandard,Version=v2.1": {
       "IHttpMachine": {
         "type": "Direct",
-        "requested": "[5.0.1, )",
-        "resolved": "5.0.1",
-        "contentHash": "1JRYuI93WOSC2UCvibpwuuo6CluNRdvN6Frt9zWlFvTABjs3f0XzG9KjzLpfZxF8eQkS5F7JKGpwRw8WZc2ELw=="
+        "requested": "[6.2.0, )",
+        "resolved": "6.2.0",
+        "contentHash": "O7YmG6hjlv+AM36n1FzcVxXX8h6dBOe57DxYgyhjj+fQ6s1P/T75uU+etALSUfzThqUvhFnwqUkyWU/8tznHYg=="
       },
       "Castle.Core": {
         "type": "Transitive",

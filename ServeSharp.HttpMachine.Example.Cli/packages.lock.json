@@ -21,8 +21,8 @@
       },
       "IHttpMachine": {
         "type": "Transitive",
-        "resolved": "5.0.1",
-        "contentHash": "1JRYuI93WOSC2UCvibpwuuo6CluNRdvN6Frt9zWlFvTABjs3f0XzG9KjzLpfZxF8eQkS5F7JKGpwRw8WZc2ELw=="
+        "resolved": "6.2.0",
+        "contentHash": "O7YmG6hjlv+AM36n1FzcVxXX8h6dBOe57DxYgyhjj+fQ6s1P/T75uU+etALSUfzThqUvhFnwqUkyWU/8tznHYg=="
       },
       "sly": {
         "type": "Transitive",
@@ -86,7 +86,7 @@
       "servesharp.httpmachine": {
         "type": "Project",
         "dependencies": {
-          "IHttpMachine": "[5.0.1, )",
+          "IHttpMachine": "[6.2.0, )",
           "ServeSharp.Core": "[1.0.0, )"
         }
       }
